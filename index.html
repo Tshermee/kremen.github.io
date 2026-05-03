@@ -79,12 +79,6 @@
       text-shadow:0 0 4px var(--amber-glow);
     }
 
-    #globe {
-      white-space:pre; font-size:0.54em; line-height:1.1;
-      text-align:center; margin:0.6rem 0 1.2rem;
-      opacity:0.85; text-shadow:0 0 6px var(--amber-glow);
-    }
-
     #map-wrap { position:relative; z-index:1; margin-top:1rem; border-top:1px solid rgba(107,66,0,0.4); padding-top:1.2rem; }
     #map-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.5rem; font-size:0.78em; letter-spacing:0.18em; opacity:0.6; text-shadow:0 0 6px var(--amber-glow); }
     #map-coords { opacity:1; letter-spacing:0.1em; }
@@ -107,7 +101,6 @@
   <div class="screen">
     <div id="content"></div>
     <pre id="oscilloscope"></pre>
-    <pre id="globe"></pre>
 
     <div id="map-wrap">
       <div id="map-header">
@@ -141,7 +134,26 @@ window.worldData = fetch('countries-110m.json').then(r => r.json());
 (function(){
   const overlay = document.getElementById('boot-overlay');
   const out     = document.getElementById('boot-text');
-  const lines   = ['> POST ......... OK','> fs ........... OK','> starting .....','','welcome.'];
+  const lines = [
+    '[    0.000000] Linux version 6.6.0-kremen #1 SMP PREEMPT_DYNAMIC',
+    '[    0.000001] Command line: BOOT_IMAGE=/vmlinuz root=/dev/nvme0n1p2 quiet',
+    '[    0.041337] ACPI: IRQ0 used by override.',
+    '[    0.312000] PCI: Using configuration type 1 for base access',
+    '[    0.420000] Initializing cgroup subsys cpuset ... done',
+    '[    0.694200] Loading /proc/self/ego ... ENOENT (expected)',
+    '[    1.000000] systemd[1]: Reached target Basic System.',
+    '[    1.001000] Started D-Bus System Message Bus.',
+    '[    1.337000] coffee.service: activating',
+    '[    1.338000] coffee.service: Failed to start — ENOBEANS',
+    '[    1.339000] imposter-syndrome.service: active (running) since boot',
+    '[    1.500000] Mounting /mnt/side-projects ... 47 found, 0 finished',
+    '[    1.802000] tab-limit.service: WARNING: 847 tabs still open',
+    '[    2.001000] ssh: no host key found, generating new identity',
+    '[    2.100000] Reached target Multi-User System.',
+    '[    2.101000] Started kremen.io.',
+    '',
+    'kremen login: _',
+  ];
   let li=0, ci=0, text='';
   function tick(){
     if(li>=lines.length){
@@ -149,8 +161,8 @@ window.worldData = fetch('countries-110m.json').then(r => r.json());
       return;
     }
     const line=lines[li];
-    if(ci<line.length){ text+=line[ci++]; out.textContent=text+'█'; setTimeout(tick,7+Math.random()*6); }
-    else{ text+='\n'; out.textContent=text+'█'; li++;ci=0; setTimeout(tick,60); }
+    if(ci<line.length){ text+=line[ci++]; out.textContent=text+'█'; setTimeout(tick,4+Math.random()*4); }
+    else{ text+='\n'; out.textContent=text+'█'; li++;ci=0; setTimeout(tick,li<16?30:220); }
   }
   tick();
 })();
@@ -196,127 +208,6 @@ window.worldData = fetch('countries-110m.json').then(r => r.json());
       line+=BARS[Math.max(0,Math.min(7,Math.round(v*7)))];
     }
     el.textContent=line; t+=0.08;
-    requestAnimationFrame(render);
-  }
-  render();
-})();
-
-// ── globe (ray-cast, adamsky style) ────────────────
-(async function(){
-  const el=document.getElementById('globe');
-
-  // Grid size: chars are ~2× taller than wide, so COLS ≈ 2×ROWS for circular globe
-  const COLS=54, ROWS=26;
-  const SX=COLS*0.46; // half-width in char units  (≈ physical radius x)
-  const SY=ROWS*0.90; // half-height in char units (≈ physical radius y, *2 for aspect)
-  // For a circle: SX*charW = SY/2*charH → SX = SY/2 * (charH/charW≈2) → SX≈SY ✓
-
-  // Palette: space=dark → @ = bright (18 levels, matches adamsky)
-  const PAL=' .:;,wioOgLXHWYV@';
-
-  // Light direction (screen-space: x right, y up, z toward camera)
-  const lx=0.4, ly=0.6, lz=0.7;
-  const lm=Math.sqrt(lx*lx+ly*ly+lz*lz);
-  const LX=lx/lm, LY=ly/lm, LZ=lz/lm;
-
-  // Pre-compute land texture via canvas rasterization
-  const world=await window.worldData;
-  const land=topojson.feature(world,world.objects.land);
-  const TW=360, TH=180;
-  const tc=document.createElement('canvas'); tc.width=TW; tc.height=TH;
-  const tx=tc.getContext('2d');
-  tx.fillStyle='#000'; tx.fillRect(0,0,TW,TH);
-  tx.fillStyle='#fff';
-  function texRing(ring){
-    if(!ring.length)return;
-    let pLon=ring[0][0];
-    tx.moveTo((pLon+180)/360*TW,(90-ring[0][1])/180*TH);
-    for(let i=1;i<ring.length;i++){
-      const [lon,lat]=ring[i];
-      if(Math.abs(lon-pLon)>180) tx.moveTo((lon+180)/360*TW,(90-lat)/180*TH);
-      else tx.lineTo((lon+180)/360*TW,(90-lat)/180*TH);
-      pLon=lon;
-    }
-  }
-  tx.beginPath();
-  const geom=land.geometry||land;
-  if(geom.type==='MultiPolygon') for(const p of geom.coordinates) texRing(p[0]);
-  else if(geom.type==='Polygon') texRing(geom.coordinates[0]);
-  tx.fill();
-  const img=tx.getImageData(0,0,TW,TH).data;
-
-  function isLand(lon,lat){ // lon,lat in radians
-    const ttx=((Math.floor((lon/Math.PI+1)*TW/2)%TW)+TW)%TW;
-    const tty=Math.max(0,Math.min(TH-1,Math.floor((Math.PI/2-lat)/Math.PI*TH)));
-    return img[(tty*TW+ttx)*4]>128;
-  }
-
-  // City dots in radians
-  const cityDots=CITIES.map(c=>({
-    name:c.name,
-    latR:c.lat*Math.PI/180,
-    lonR:c.lon*Math.PI/180,
-  }));
-
-  let t=0;
-  function render(){
-    const cosT=Math.cos(t), sinT=Math.sin(t);
-    const buf=new Array(COLS*ROWS).fill(' ');
-
-    for(let yi=0;yi<ROWS;yi++){
-      for(let xi=0;xi<COLS;xi++){
-        // Ray through this cell
-        const sx=(xi-COLS/2)/SX; // [-1,1] at sphere edge
-        const sy=-(yi-ROWS/2)/(SY/2); // negated: top of grid = north
-        const disc=1-sx*sx-sy*sy;
-        if(disc<0)continue;
-        const sz=Math.sqrt(disc); // z faces camera
-
-        // Un-rotate Y by -t to get original sphere coords
-        const ox=sx*cosT-sz*sinT;
-        const oy=sy;
-        const oz=sx*sinT+sz*cosT;
-
-        // Spherical coords
-        const lat=Math.asin(Math.max(-1,Math.min(1,oy)));
-        const lon=Math.atan2(ox,oz);
-
-        // Lighting (surface normal in screen-space is [sx,sy,sz])
-        const dot=Math.max(0,sx*LX+sy*LY+sz*LZ);
-
-        const onLand=isLand(lon,lat);
-        let ci;
-        if(onLand){
-          ci=Math.max(2,Math.round(dot*(PAL.length-1)));
-        } else {
-          ci=dot>0.55?1:0;
-        }
-        buf[yi*COLS+xi]=PAL[ci];
-      }
-    }
-
-    // City dots
-    for(const c of cityDots){
-      const px=Math.sin(c.lonR)*Math.cos(c.latR);
-      const py=Math.sin(c.latR);
-      const pz=Math.cos(c.lonR)*Math.cos(c.latR);
-      // Rotate by t (Y-axis)
-      const rx= px*cosT+pz*sinT;
-      const ry= py;
-      const rz=-px*sinT+pz*cosT;
-      if(rz<=0.05)continue; // back hemisphere
-      const gxi=Math.round(rx*SX+COLS/2);
-      const gyi=Math.round(-ry*(SY/2)+ROWS/2);
-      if(gxi>=0&&gxi<COLS&&gyi>=0&&gyi<ROWS){
-        buf[gyi*COLS+gxi]='X';
-        // halo
-        if(gxi>0) buf[gyi*COLS+gxi-1]=buf[gyi*COLS+gxi-1]===' '?'.':buf[gyi*COLS+gxi-1];
-        if(gxi<COLS-1) buf[gyi*COLS+gxi+1]=buf[gyi*COLS+gxi+1]===' '?'.':buf[gyi*COLS+gxi+1];
-      }
-    }
-
-    el.textContent=Array.from({length:ROWS},(_,r)=>buf.slice(r*COLS,(r+1)*COLS).join('')).join('\n');
-    t+=0.004;
     requestAnimationFrame(render);
   }
   render();
