@@ -38,6 +38,7 @@
     }
 
     body {
+      position: relative;
       display: flex;
       justify-content: center;
       padding: 4rem 1.5rem 6rem;
@@ -48,20 +49,10 @@
       animation: flicker 14s infinite;
     }
 
-    .screen {
-      position: relative;
-      max-width: 680px;
-      width: 100%;
-      padding: 3rem 2.5rem;
-      background: var(--bg);
-      border-radius: 4px;
-      box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.45);
-    }
-
     /* scanlines */
-    .screen::before {
+    body::before {
       content: '';
-      position: absolute;
+      position: fixed;
       inset: 0;
       background: repeating-linear-gradient(
         0deg,
@@ -72,18 +63,23 @@
       );
       pointer-events: none;
       z-index: 10;
-      border-radius: 4px;
     }
 
     /* vignette */
-    .screen::after {
+    body::after {
       content: '';
-      position: absolute;
+      position: fixed;
       inset: 0;
       background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
       pointer-events: none;
       z-index: 11;
-      border-radius: 4px;
+    }
+
+    .screen {
+      position: relative;
+      max-width: 680px;
+      width: 100%;
+      padding: 3rem 2.5rem;
     }
 
     #content {
