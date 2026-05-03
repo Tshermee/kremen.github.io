@@ -255,7 +255,7 @@
       .catch(err => { document.getElementById('content').textContent = '// error loading content — ' + err.message; });
 
     // Map
-    (async function () {
+    (async function () { try {
       const canvas = document.getElementById('map');
       const ctx = canvas.getContext('2d');
       const wrap = document.getElementById('map-wrap');
@@ -287,8 +287,8 @@
         { name: 'Tokyo',      lat: 35.68,  lon:  139.65 },
       ];
 
-      // Load world atlas
-      const world = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
+      // Load world atlas (served locally)
+      const world = await fetch('countries-110m.json').then(r => r.json());
       const land      = topojson.feature(world, world.objects.land);
       const countries = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
 
@@ -423,7 +423,14 @@
       });
 
       draw();
-    })();
+    } catch(e) {
+      const canvas = document.getElementById('map');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#e8a000';
+      ctx.font = "16px 'VT323', monospace";
+      ctx.fillText('// map error: ' + e.message, 10, 30);
+      console.error('map error:', e);
+    }})();
   </script>
 </body>
 </html>
