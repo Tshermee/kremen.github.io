@@ -384,15 +384,15 @@
           if (!geom) return;
           if (geom.type === 'Polygon') {
             ctx.beginPath();
-            geom.coordinates.forEach(traceRing);
+            traceRing(geom.coordinates[0]);
             ctx.fillStyle = LAND_FILL;
-            ctx.fill('evenodd');
+            ctx.fill();
           } else if (geom.type === 'MultiPolygon') {
             geom.coordinates.forEach(poly => {
               ctx.beginPath();
-              poly.forEach(traceRing);
+              traceRing(poly[0]);
               ctx.fillStyle = LAND_FILL;
-              ctx.fill('evenodd');
+              ctx.fill();
             });
           } else if (geom.type === 'Feature') {
             fillGeom(geom.geometry);
