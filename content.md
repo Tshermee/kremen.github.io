@@ -4,13 +4,13 @@
 
 ---
 
-**what i'm up to**
+## what i'm up to
 - building AI tools and products around agentic automation for ERPs and support use cases
 - organizing [Uphill Conf](https://uphillconf.com/) — a highly applied AI conference in Bern
 
 ---
 
-**previously**
+## previously
 - scaled [Curatio](https://rxpx.health) to 85+ countries and multiple languages — now [RxPx](https://rxpx.health)
 - created a new [SIGGRAPH](https://www.siggraph.org) format called Spatial Storytelling to showcase world-class XR and AI work
 - co-founded Kreis, an XR product turned boutique XR event studio — delivered work for [Cannes Film Festival](https://www.festival-cannes.com), [Temasek](https://www.temasek.com.sg), [Alliance Française](https://www.alliancefr.org) and more
@@ -20,4 +20,7 @@
 
 ---
 
-*2026*
+## things i like
+-
+
+---
