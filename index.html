@@ -191,6 +191,9 @@ window.worldData = fetch('countries-110m.json').then(r => r.json());
 function startGlitch(){
   const NOISE='!@#$%^&*<>?/|[]{}=~`░▒▓╬╫╪┼╔╗╚╝║═';
   const body=document.body;
+  // WeakMap stores the TRUE original so stacked glitches never corrupt the baseline
+  const originals=new WeakMap();
+  const restoreTimers=new WeakMap();
 
   function getNodes(){
     const el=document.getElementById('content');
@@ -201,35 +204,44 @@ function startGlitch(){
     return nodes;
   }
 
-  // scramble a chunk of one text node
-  function scrambleNode(){
-    const nodes=getNodes(); if(!nodes.length)return;
-    const target=nodes[Math.floor(Math.random()*nodes.length)];
-    const orig=target.textContent;
+  function corrupt(node,ms){
+    // Capture true original only once per node
+    if(!originals.has(node)) originals.set(node,node.textContent);
+    const orig=originals.get(node);
     const len=Math.floor(Math.random()*12)+3;
     const start=Math.floor(Math.random()*Math.max(1,orig.length-len));
     let g=orig.slice(0,start);
     for(let i=0;i<len;i++)g+=NOISE[Math.floor(Math.random()*NOISE.length)];
-    target.textContent=g+orig.slice(start+len);
-    setTimeout(()=>{ target.textContent=orig; },40+Math.random()*100);
+    node.textContent=g+orig.slice(start+len);
+    // Clear any pending restore, schedule a new one
+    clearTimeout(restoreTimers.get(node));
+    restoreTimers.set(node, setTimeout(()=>{
+      node.textContent=orig;
+      originals.delete(node);
+    }, ms));
   }
 
-  // nuke an entire node briefly
   function nukeNode(){
     const nodes=getNodes(); if(!nodes.length)return;
-    const target=nodes[Math.floor(Math.random()*nodes.length)];
-    const orig=target.textContent;
-    target.textContent=Array.from({length:orig.length},()=>NOISE[Math.floor(Math.random()*NOISE.length)]).join('');
-    setTimeout(()=>{ target.textContent=orig; },50+Math.random()*80);
+    const node=nodes[Math.floor(Math.random()*nodes.length)];
+    if(!originals.has(node)) originals.set(node,node.textContent);
+    const orig=originals.get(node);
+    node.textContent=Array.from({length:orig.length},()=>NOISE[Math.floor(Math.random()*NOISE.length)]).join('');
+    clearTimeout(restoreTimers.get(node));
+    restoreTimers.set(node, setTimeout(()=>{ node.textContent=orig; originals.delete(node); },60+Math.random()*80));
   }
 
-  // rapid-fire burst: several scrambles in quick succession
+  function scrambleNode(delay=0){
+    const nodes=getNodes(); if(!nodes.length)return;
+    const node=nodes[Math.floor(Math.random()*nodes.length)];
+    setTimeout(()=>corrupt(node, 50+Math.random()*120), delay);
+  }
+
   function burst(){
     const count=Math.floor(Math.random()*4)+2;
-    for(let i=0;i<count;i++) setTimeout(scrambleNode, i*55+Math.random()*40);
+    for(let i=0;i<count;i++) scrambleNode(i*55+Math.random()*40);
   }
 
-  // css flicker: briefly shift hue / desaturate the whole screen
   function flicker(){
     body.style.filter='brightness(1.6) hue-rotate(8deg)';
     setTimeout(()=>{ body.style.filter='brightness(0.4)'; },30);
@@ -245,7 +257,7 @@ function startGlitch(){
     sched();
   }
 
-  function sched(){ setTimeout(glitch,400+Math.random()*1800); }
+  function sched(){ setTimeout(glitch,5500+Math.random()*3000); }
   sched();
 }
 
