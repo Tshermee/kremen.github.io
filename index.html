@@ -73,12 +73,6 @@
     #content blockquote { border-left:2px solid var(--amber-dim); padding-left:1em; opacity:0.7; }
     #content:empty::after { content:'_'; animation:cursor 1s step-end infinite; text-shadow:0 0 7px var(--amber-glow); }
 
-    #oscilloscope {
-      white-space:pre; font-size:0.75em; line-height:1;
-      margin:1.6rem 0 0; opacity:0.4; letter-spacing:0.03em;
-      text-shadow:0 0 4px var(--amber-glow);
-    }
-
     #map-wrap { position:relative; z-index:1; margin-top:1rem; border-top:1px solid rgba(107,66,0,0.4); padding-top:1.2rem; }
     #map-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.5rem; font-size:0.78em; letter-spacing:0.18em; opacity:0.6; text-shadow:0 0 6px var(--amber-glow); }
     #map-coords { opacity:1; letter-spacing:0.1em; }
@@ -100,8 +94,6 @@
 
   <div class="screen">
     <div id="content"></div>
-    <pre id="oscilloscope"></pre>
-
     <div id="map-wrap">
       <div id="map-header">
         <span>// LOCATOR</span>
@@ -195,45 +187,65 @@ window.worldData = fetch('countries-110m.json').then(r => r.json());
   draw();
 })();
 
-// ── oscilloscope ────────────────────────────────────
-(function(){
-  const el=document.getElementById('oscilloscope');
-  const BARS='▁▂▃▄▅▆▇█';
-  let t=0;
-  function render(){
-    const W=Math.floor((el.parentElement.clientWidth||600)/16.5);
-    let line='';
-    for(let i=0;i<W;i++){
-      const v=Math.sin(i/W*Math.PI*6-t)*0.4+Math.sin(i/W*Math.PI*3-t*0.7)*0.4+0.2;
-      line+=BARS[Math.max(0,Math.min(7,Math.round(v*7)))];
-    }
-    el.textContent=line; t+=0.08;
-    requestAnimationFrame(render);
-  }
-  render();
-})();
-
 // ── signal corruption ──────────────────────────────
 function startGlitch(){
-  const NOISE='!@#$%^&*<>?/|[]{}=~`░▒▓';
-  function glitch(){
+  const NOISE='!@#$%^&*<>?/|[]{}=~`░▒▓╬╫╪┼╔╗╚╝║═';
+  const body=document.body;
+
+  function getNodes(){
     const el=document.getElementById('content');
-    if(!el)return sched();
+    if(!el)return [];
     const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
     const nodes=[]; let n;
-    while((n=walker.nextNode()))if(n.textContent.trim().length>4)nodes.push(n);
-    if(!nodes.length)return sched();
+    while((n=walker.nextNode()))if(n.textContent.trim().length>3)nodes.push(n);
+    return nodes;
+  }
+
+  // scramble a chunk of one text node
+  function scrambleNode(){
+    const nodes=getNodes(); if(!nodes.length)return;
     const target=nodes[Math.floor(Math.random()*nodes.length)];
     const orig=target.textContent;
-    const start=Math.floor(Math.random()*(orig.length-4));
-    const len=Math.floor(Math.random()*5)+2;
+    const len=Math.floor(Math.random()*12)+3;
+    const start=Math.floor(Math.random()*Math.max(1,orig.length-len));
     let g=orig.slice(0,start);
     for(let i=0;i<len;i++)g+=NOISE[Math.floor(Math.random()*NOISE.length)];
     target.textContent=g+orig.slice(start+len);
-    setTimeout(()=>{ target.textContent=orig; },60+Math.random()*80);
+    setTimeout(()=>{ target.textContent=orig; },40+Math.random()*100);
+  }
+
+  // nuke an entire node briefly
+  function nukeNode(){
+    const nodes=getNodes(); if(!nodes.length)return;
+    const target=nodes[Math.floor(Math.random()*nodes.length)];
+    const orig=target.textContent;
+    target.textContent=Array.from({length:orig.length},()=>NOISE[Math.floor(Math.random()*NOISE.length)]).join('');
+    setTimeout(()=>{ target.textContent=orig; },50+Math.random()*80);
+  }
+
+  // rapid-fire burst: several scrambles in quick succession
+  function burst(){
+    const count=Math.floor(Math.random()*4)+2;
+    for(let i=0;i<count;i++) setTimeout(scrambleNode, i*55+Math.random()*40);
+  }
+
+  // css flicker: briefly shift hue / desaturate the whole screen
+  function flicker(){
+    body.style.filter='brightness(1.6) hue-rotate(8deg)';
+    setTimeout(()=>{ body.style.filter='brightness(0.4)'; },30);
+    setTimeout(()=>{ body.style.filter=''; },80);
+  }
+
+  function glitch(){
+    const r=Math.random();
+    if(r<0.45)      scrambleNode();
+    else if(r<0.70) burst();
+    else if(r<0.85) nukeNode();
+    else            { burst(); flicker(); }
     sched();
   }
-  function sched(){ setTimeout(glitch,2500+Math.random()*4000); }
+
+  function sched(){ setTimeout(glitch,400+Math.random()*1800); }
   sched();
 }
 
