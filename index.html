@@ -379,11 +379,28 @@
         ctx.shadowBlur = 0;
         ctx.stroke();
 
-        // Land fill
-        ctx.beginPath();
-        tracePath(land);
-        ctx.fillStyle = LAND_FILL;
-        ctx.fill('evenodd');
+        // Land fill — one path per polygon to avoid evenodd artifacts from antimeridian splits
+        function fillGeom(geom) {
+          if (!geom) return;
+          if (geom.type === 'Polygon') {
+            ctx.beginPath();
+            geom.coordinates.forEach(traceRing);
+            ctx.fillStyle = LAND_FILL;
+            ctx.fill('evenodd');
+          } else if (geom.type === 'MultiPolygon') {
+            geom.coordinates.forEach(poly => {
+              ctx.beginPath();
+              poly.forEach(traceRing);
+              ctx.fillStyle = LAND_FILL;
+              ctx.fill('evenodd');
+            });
+          } else if (geom.type === 'Feature') {
+            fillGeom(geom.geometry);
+          } else if (geom.type === 'FeatureCollection') {
+            geom.features.forEach(f => fillGeom(f.geometry));
+          }
+        }
+        fillGeom(land);
 
         // Land outline + glow
         ctx.beginPath();
