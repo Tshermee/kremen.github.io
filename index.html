@@ -128,6 +128,10 @@ window.worldData = fetch('countries-110m.json').then(r => r.json());
 (function(){
   const overlay = document.getElementById('boot-overlay');
   const out     = document.getElementById('boot-text');
+  const COOLDOWN = 60 * 60 * 1000; // 1 hour
+  const last = parseInt(localStorage.getItem('kremen_boot')||'0',10);
+  if(Date.now()-last < COOLDOWN){ overlay.style.display='none'; startGlitch(); return; }
+  localStorage.setItem('kremen_boot', Date.now());
   const lines = [
     '[    0.000000] Linux version 6.6.0-kremen #1 SMP PREEMPT_DYNAMIC',
     '[    0.000001] Command line: BOOT_IMAGE=/vmlinuz root=/dev/nvme0n1p2 quiet',
@@ -271,6 +275,7 @@ function startGlitch(){
 }
 
 // ── content loader ─────────────────────────────────
+marked.use({ renderer:{ link({href,title,text}){ return `<a href="${href}"${title?` title="${title}"`:''}  target="_blank" rel="noopener">${text}</a>`; } } });
 marked.setOptions({breaks:true});
 fetch('content.md')
   .then(r=>{ if(!r.ok)throw new Error(r.status); return r.text(); })
