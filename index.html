@@ -324,27 +324,27 @@
       }
       function traceRing(coords) {
         if (!coords.length) return;
-        const [x0, y0] = project(coords[0][0], coords[0][1]);
-        ctx.moveTo(x0, y0);
-        let prevX = x0;
+        ctx.moveTo(...project(coords[0][0], coords[0][1]));
+        let prevLon = coords[0][0];
         for (let i = 1; i < coords.length; i++) {
-          const [x, y] = project(coords[i][0], coords[i][1]);
-          if (Math.abs(x - prevX) > W / 2) ctx.moveTo(x, y); // antimeridian jump
+          const [lon, lat] = coords[i];
+          const [x, y] = project(lon, lat);
+          if (Math.abs(lon - prevLon) > 180) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
-          prevX = x;
+          prevLon = lon;
         }
-        if (Math.abs(x0 - prevX) <= W / 2) ctx.closePath();
+        if (Math.abs(coords[0][0] - prevLon) <= 180) ctx.closePath();
       }
       function traceLine(coords) {
         if (!coords.length) return;
-        const [x0, y0] = project(coords[0][0], coords[0][1]);
-        ctx.moveTo(x0, y0);
-        let prevX = x0;
+        ctx.moveTo(...project(coords[0][0], coords[0][1]));
+        let prevLon = coords[0][0];
         for (let i = 1; i < coords.length; i++) {
-          const [x, y] = project(coords[i][0], coords[i][1]);
-          if (Math.abs(x - prevX) > W / 2) ctx.moveTo(x, y);
+          const [lon, lat] = coords[i];
+          const [x, y] = project(lon, lat);
+          if (Math.abs(lon - prevLon) > 180) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
-          prevX = x;
+          prevLon = lon;
         }
       }
 
