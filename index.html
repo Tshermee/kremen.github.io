@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>kremen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@300;400&display=swap">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
   <style>
@@ -59,11 +59,11 @@
     #content h1 { font-size:2.4em; letter-spacing:0.04em; margin-bottom:0.3em; text-shadow:0 0 14px var(--amber-glow),0 0 4px rgba(232,160,0,0.5); }
     #content h2 { font-size:1.5em; margin:1.6em 0 0.4em; color:var(--amber-bright); letter-spacing:0.03em; }
     #content h3 { font-size:1.2em; margin:1.2em 0 0.3em; }
-    #content p  { margin-bottom:0.9em; opacity:0.9; }
+    #content p  { margin-bottom:0.9em; opacity:0.9; font-family:'Inter',sans-serif; font-size:0.56em; line-height:1.7; letter-spacing:0; }
     #content a  { color:var(--amber-bright); text-decoration:none; border-bottom:1px solid var(--amber-dim); transition:border-color 0.1s; }
     #content a:hover { border-bottom-color:var(--amber-bright); }
     #content ul,#content ol { margin:0 0 0.9em 1.4em; }
-    #content li { margin-bottom:0.15em; }
+    #content li { margin-bottom:0.4em; font-family:'Inter',sans-serif; font-size:0.56em; line-height:1.7; letter-spacing:0; }
     #content hr { border:none; border-top:1px solid var(--amber-dim); margin:1.6em 0; opacity:0.45; }
     #content strong { color:var(--amber-bright); }
     #content em { opacity:0.75; font-style:normal; }
@@ -197,9 +197,17 @@ function startGlitch(){
   function getNodes(){
     const el=document.getElementById('content');
     if(!el)return [];
-    const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
+    const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{
+      acceptNode(n){
+        const p=n.parentElement;
+        if(!p)return NodeFilter.FILTER_REJECT;
+        const tag=p.tagName;
+        if(/^H[1-6]$/.test(tag)||tag==='STRONG'||tag==='EM')return NodeFilter.FILTER_ACCEPT;
+        return NodeFilter.FILTER_REJECT;
+      }
+    });
     const nodes=[]; let n;
-    while((n=walker.nextNode()))if(n.textContent.trim().length>3)nodes.push(n);
+    while((n=walker.nextNode()))if(n.textContent.trim().length>2)nodes.push(n);
     return nodes;
   }
 
