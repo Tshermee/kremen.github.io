@@ -333,7 +333,7 @@
           else ctx.lineTo(x, y);
           prevLon = lon;
         }
-        if (Math.abs(coords[0][0] - prevLon) <= 180) ctx.closePath();
+        // no closePath — GeoJSON rings are explicitly closed (last pt == first pt)
       }
       function traceLine(coords) {
         if (!coords.length) return;
