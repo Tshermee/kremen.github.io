@@ -293,7 +293,7 @@
       const countries = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
 
       // Projection
-      const projection = d3.geoNaturalEarth1().fitSize([W, H], { type: 'Sphere' });
+      const projection = d3.geoEquirectangular().fitSize([W, H], { type: 'Sphere' });
       const path = d3.geoPath(projection, ctx);
 
       // Graticule (grid lines every 30°)
