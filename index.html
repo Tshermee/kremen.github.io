@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/d3-geo@3/dist/d3-geo.min.js"></script>
   <style>
     *, *::before, *::after {
       margin: 0;
@@ -254,7 +253,7 @@
       .then(text => { document.getElementById('content').innerHTML = marked.parse(text); })
       .catch(err => { document.getElementById('content').textContent = '// error loading content — ' + err.message; });
 
-    // Map
+    // Map — no d3, manual equirectangular projection
     (async function () { try {
       const canvas = document.getElementById('map');
       const ctx = canvas.getContext('2d');
@@ -262,7 +261,6 @@
       const coordsEl = document.getElementById('map-coords');
       const cityLabelEl = document.getElementById('map-city-label');
 
-      // Retina-aware sizing
       const W = wrap.clientWidth;
       const H = Math.round(W * 0.54);
       const DPR = window.devicePixelRatio || 1;
@@ -287,26 +285,61 @@
         { name: 'Tokyo',      lat: 35.68,  lon:  139.65 },
       ];
 
-      // Load world atlas (served locally)
+      function project(lon, lat) {
+        return [(lon + 180) / 360 * W, (90 - lat) / 180 * H];
+      }
+      function unproject(x, y) {
+        return [x / W * 360 - 180, 90 - y / H * 180];
+      }
+
+      function tracePath(geom) {
+        if (!geom) return;
+        if (geom.type === 'Polygon') {
+          geom.coordinates.forEach(traceRing);
+        } else if (geom.type === 'MultiPolygon') {
+          geom.coordinates.forEach(p => p.forEach(traceRing));
+        } else if (geom.type === 'LineString') {
+          traceLine(geom.coordinates);
+        } else if (geom.type === 'MultiLineString') {
+          geom.coordinates.forEach(traceLine);
+        } else if (geom.type === 'GeometryCollection') {
+          geom.geometries.forEach(tracePath);
+        } else if (geom.type === 'Feature') {
+          tracePath(geom.geometry);
+        } else if (geom.type === 'FeatureCollection') {
+          geom.features.forEach(tracePath);
+        }
+      }
+      function traceRing(coords) {
+        if (!coords.length) return;
+        const [x0, y0] = project(coords[0][0], coords[0][1]);
+        ctx.moveTo(x0, y0);
+        for (let i = 1; i < coords.length; i++) {
+          const [x, y] = project(coords[i][0], coords[i][1]);
+          ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+      }
+      function traceLine(coords) {
+        if (!coords.length) return;
+        const [x0, y0] = project(coords[0][0], coords[0][1]);
+        ctx.moveTo(x0, y0);
+        for (let i = 1; i < coords.length; i++) {
+          const [x, y] = project(coords[i][0], coords[i][1]);
+          ctx.lineTo(x, y);
+        }
+      }
+
       const world = await fetch('countries-110m.json').then(r => r.json());
-      const land      = topojson.feature(world, world.objects.land);
-      const countries = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
+      const land        = topojson.feature(world, world.objects.land);
+      const bordersMesh = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
 
-      // Projection
-      const projection = d3.geoEquirectangular().fitSize([W, H], { type: 'Sphere' });
-      const path = d3.geoPath(projection, ctx);
-
-      // Graticule (grid lines every 30°)
-      const graticule = d3.geoGraticule().step([30, 30])();
-
-      // Project city coordinates
       const cityDots = cities.map(c => {
-        const [x, y] = projection([c.lon, c.lat]);
+        const [x, y] = project(c.lon, c.lat);
         return { ...c, x, y };
       });
 
       let hoveredCity = null;
-      let mouseGeo    = null;
       let t = 0;
 
       function draw() {
@@ -314,7 +347,16 @@
 
         // Graticule
         ctx.beginPath();
-        path(graticule);
+        for (let lat = -60; lat <= 60; lat += 30) {
+          const [x0, y0] = project(-180, lat);
+          const [x1]     = project( 180, lat);
+          ctx.moveTo(x0, y0); ctx.lineTo(x1, y0);
+        }
+        for (let lon = -150; lon < 180; lon += 30) {
+          const [x0, y0] = project(lon,  90);
+          const [,   y1] = project(lon, -90);
+          ctx.moveTo(x0, y0); ctx.lineTo(x0, y1);
+        }
         ctx.strokeStyle = GRID;
         ctx.lineWidth = 0.4;
         ctx.shadowBlur = 0;
@@ -322,13 +364,13 @@
 
         // Land fill
         ctx.beginPath();
-        path(land);
+        tracePath(land);
         ctx.fillStyle = LAND_FILL;
-        ctx.fill();
+        ctx.fill('evenodd');
 
-        // Land outline (glow)
+        // Land outline + glow
         ctx.beginPath();
-        path(land);
+        tracePath(land);
         ctx.strokeStyle = LAND_STROKE;
         ctx.lineWidth = 0.6;
         ctx.shadowColor = AMBER;
@@ -336,9 +378,9 @@
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // Country borders (interior)
+        // Country borders
         ctx.beginPath();
-        path(countries);
+        tracePath(bordersMesh);
         ctx.strokeStyle = BORDER;
         ctx.lineWidth = 0.4;
         ctx.stroke();
@@ -349,15 +391,13 @@
           const isHover = hoveredCity === city.name;
           const pulse = Math.sin(t + city.x * 0.05) * 0.5 + 0.5;
 
-          // Outer pulse ring
           ctx.beginPath();
           ctx.arc(city.x, city.y, 5 + pulse * 6, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(255, 183, 0, ${0.12 + pulse * 0.18})`;
+          ctx.strokeStyle = `rgba(255,183,0,${(0.12 + pulse * 0.18).toFixed(2)})`;
           ctx.lineWidth = 0.8;
           ctx.shadowBlur = 0;
           ctx.stroke();
 
-          // Dot
           ctx.beginPath();
           ctx.arc(city.x, city.y, isHover ? 4.5 : 3, 0, Math.PI * 2);
           ctx.fillStyle = AMBER_BRIGHT;
@@ -366,7 +406,6 @@
           ctx.fill();
           ctx.shadowBlur = 0;
 
-          // Label on hover
           if (isHover) {
             const label = city.name.toUpperCase();
             ctx.font = "15px 'VT323', monospace";
@@ -374,10 +413,9 @@
             ctx.shadowColor = AMBER;
             ctx.shadowBlur = 10;
             const tw = ctx.measureText(label).width;
-            let lx = city.x + 10;
-            let ly = city.y + 5;
+            let lx = city.x + 10, ly = city.y + 5;
             if (lx + tw > W - 6) lx = city.x - tw - 10;
-            if (ly > H - 10)     ly = city.y - 10;
+            if (ly > H - 10) ly = city.y - 10;
             ctx.fillText(label, lx, ly);
             ctx.shadowBlur = 0;
           }
@@ -386,30 +424,17 @@
         requestAnimationFrame(draw);
       }
 
-      // Mouse tracking
       canvas.addEventListener('mousemove', e => {
         const rect = canvas.getBoundingClientRect();
         const mx = e.clientX - rect.left;
         const my = e.clientY - rect.top;
-
-        // Reverse-project for coordinate display
-        const geo = projection.invert([mx, my]);
-        if (geo) {
-          const lon = geo[0].toFixed(3);
-          const lat = geo[1].toFixed(3);
-          const lonStr = (lon >= 0 ? '+' : '') + lon;
-          const latStr = (lat >= 0 ? '+' : '') + lat;
-          coordsEl.textContent = `LAT ${latStr}  LON ${lonStr}`;
-        }
-
+        const [lon, lat] = unproject(mx, my);
+        const ns = lat >= 0 ? 'N' : 'S', ew = lon >= 0 ? 'E' : 'W';
+        coordsEl.textContent = `${Math.abs(lat).toFixed(2)}°${ns}  ${Math.abs(lon).toFixed(2)}°${ew}`;
         hoveredCity = null;
         for (const city of cityDots) {
-          const dx = mx - city.x;
-          const dy = my - city.y;
-          if (Math.sqrt(dx * dx + dy * dy) < 14) {
-            hoveredCity = city.name;
-            break;
-          }
+          const dx = mx - city.x, dy = my - city.y;
+          if (Math.sqrt(dx*dx + dy*dy) < 14) { hoveredCity = city.name; break; }
         }
         cityLabelEl.textContent = hoveredCity ? '> ' + hoveredCity.toUpperCase() : '\u00a0';
         canvas.style.cursor = hoveredCity ? 'crosshair' : 'default';
