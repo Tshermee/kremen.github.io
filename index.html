@@ -226,6 +226,33 @@
       opacity: 0.45;
       letter-spacing: 0.12em;
     }
+
+    #map-tooltip {
+      position: absolute;
+      display: none;
+      pointer-events: none;
+      z-index: 20;
+      background: #0c0800;
+      border: 1px solid var(--amber-dim);
+      padding: 0.5em 0.8em;
+      max-width: 220px;
+      line-height: 1.4;
+      box-shadow: 0 0 12px rgba(232, 160, 0, 0.2), inset 0 0 20px rgba(0,0,0,0.4);
+    }
+    #map-tooltip .tt-name {
+      color: var(--amber-bright);
+      font-size: 0.9em;
+      letter-spacing: 0.12em;
+      text-shadow: 0 0 8px var(--amber-glow);
+      display: block;
+      margin-bottom: 0.15em;
+    }
+    #map-tooltip .tt-text {
+      color: var(--amber);
+      font-size: 0.78em;
+      opacity: 0.85;
+      text-shadow: 0 0 5px var(--amber-glow);
+    }
   </style>
 </head>
 <body>
@@ -238,6 +265,7 @@
         <span id="map-coords">&nbsp;</span>
       </div>
       <canvas id="map"></canvas>
+      <div id="map-tooltip"><span class="tt-name"></span><span class="tt-text"></span></div>
       <div id="map-footer">
         <span id="map-city-label">&nbsp;</span>
         <span>ZOOM 1.00</span>
@@ -260,6 +288,9 @@
       const wrap = document.getElementById('map-wrap');
       const coordsEl = document.getElementById('map-coords');
       const cityLabelEl = document.getElementById('map-city-label');
+      const tooltip = document.getElementById('map-tooltip');
+      const ttName = tooltip.querySelector('.tt-name');
+      const ttText = tooltip.querySelector('.tt-text');
 
       const W = wrap.clientWidth;
       const H = Math.round(W * 0.54);
@@ -278,11 +309,13 @@
       const GRID         = 'rgba(232, 160, 0, 0.1)';
 
       const cities = [
-        { name: 'Vancouver',  lat: 49.28,  lon: -123.12 },
-        { name: 'Bern',       lat: 46.95,  lon:    7.45 },
-        { name: 'Singapore',  lat:  1.35,  lon:  103.82 },
-        { name: 'Cannes',     lat: 43.55,  lon:    7.02 },
-        { name: 'Tokyo',      lat: 35.68,  lon:  139.65 },
+        { name: 'Vancouver',  lat: 49.28,   lon: -123.12, tooltip: '' },
+        { name: 'Bern',       lat: 46.95,   lon:    7.45, tooltip: '' },
+        { name: 'Singapore',  lat:  1.35,   lon:  103.82, tooltip: '' },
+        { name: 'Cannes',     lat: 43.55,   lon:    7.02, tooltip: '' },
+        { name: 'Tokyo',      lat: 35.68,   lon:  139.65, tooltip: '' },
+        { name: 'Yosemite',   lat: 37.865,  lon: -119.54, tooltip: '' },
+        { name: 'Los Angeles',lat: 34.052,  lon: -118.24, tooltip: '' },
       ];
 
       // Cropped equirectangular — trims edges to zoom in
@@ -440,24 +473,14 @@
           ctx.fill();
           ctx.shadowBlur = 0;
 
-          if (isHover) {
-            const label = city.name.toUpperCase();
-            ctx.font = "15px 'VT323', monospace";
-            ctx.fillStyle = AMBER_BRIGHT;
-            ctx.shadowColor = AMBER;
-            ctx.shadowBlur = 10;
-            const tw = ctx.measureText(label).width;
-            let lx = city.x + 10, ly = city.y + 5;
-            if (lx + tw > W - 6) lx = city.x - tw - 10;
-            if (ly > H - 10) ly = city.y - 10;
-            ctx.fillText(label, lx, ly);
-            ctx.shadowBlur = 0;
-          }
         }
 
         ctx.restore();
         requestAnimationFrame(draw);
       }
+
+      // Header height offset (for tooltip positioning within map-wrap)
+      const mapHeader = document.getElementById('map-header');
 
       canvas.addEventListener('mousemove', e => {
         const rect = canvas.getBoundingClientRect();
@@ -466,19 +489,39 @@
         const [lon, lat] = unproject(mx, my);
         const ns = lat >= 0 ? 'N' : 'S', ew = lon >= 0 ? 'E' : 'W';
         coordsEl.textContent = `${Math.abs(lat).toFixed(2)}°${ns}  ${Math.abs(lon).toFixed(2)}°${ew}`;
-        hoveredCity = null;
+
+        let found = null;
         for (const city of cityDots) {
           const dx = mx - city.x, dy = my - city.y;
-          if (Math.sqrt(dx*dx + dy*dy) < 14) { hoveredCity = city.name; break; }
+          if (Math.sqrt(dx*dx + dy*dy) < 14) { found = city; break; }
         }
+        hoveredCity = found ? found.name : null;
         cityLabelEl.textContent = hoveredCity ? '> ' + hoveredCity.toUpperCase() : '\u00a0';
         canvas.style.cursor = hoveredCity ? 'crosshair' : 'default';
+
+        if (found) {
+          ttName.textContent = found.name.toUpperCase();
+          ttText.textContent = found.tooltip;
+          ttText.style.display = found.tooltip ? 'block' : 'none';
+          // Position relative to map-wrap
+          const headerH = mapHeader.offsetHeight;
+          let tx = found.x + 14;
+          let ty = headerH + found.y - 10;
+          tooltip.style.display = 'block';
+          // Nudge left if near right edge
+          if (tx + 230 > W) tx = found.x - 230;
+          tooltip.style.left = tx + 'px';
+          tooltip.style.top  = ty + 'px';
+        } else {
+          tooltip.style.display = 'none';
+        }
       });
 
       canvas.addEventListener('mouseleave', () => {
         hoveredCity = null;
         coordsEl.textContent = '\u00a0';
         cityLabelEl.textContent = '\u00a0';
+        tooltip.style.display = 'none';
         canvas.style.cursor = 'default';
       });
 
