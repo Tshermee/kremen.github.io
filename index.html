@@ -326,19 +326,25 @@
         if (!coords.length) return;
         const [x0, y0] = project(coords[0][0], coords[0][1]);
         ctx.moveTo(x0, y0);
+        let prevX = x0;
         for (let i = 1; i < coords.length; i++) {
           const [x, y] = project(coords[i][0], coords[i][1]);
-          ctx.lineTo(x, y);
+          if (Math.abs(x - prevX) > W / 2) ctx.moveTo(x, y); // antimeridian jump
+          else ctx.lineTo(x, y);
+          prevX = x;
         }
-        ctx.closePath();
+        if (Math.abs(x0 - prevX) <= W / 2) ctx.closePath();
       }
       function traceLine(coords) {
         if (!coords.length) return;
         const [x0, y0] = project(coords[0][0], coords[0][1]);
         ctx.moveTo(x0, y0);
+        let prevX = x0;
         for (let i = 1; i < coords.length; i++) {
           const [x, y] = project(coords[i][0], coords[i][1]);
-          ctx.lineTo(x, y);
+          if (Math.abs(x - prevX) > W / 2) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+          prevX = x;
         }
       }
 
