@@ -15,132 +15,89 @@
       --amber: #e8a000;
       --amber-bright: #ffb700;
       --amber-dim: #6b4200;
-      --amber-glow: rgba(232, 160, 0, 0.55);
+      --amber-glow: rgba(232,160,0,0.55);
       --bg: #0c0800;
     }
 
     @keyframes flicker {
-      0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
-      20%, 24%, 55% { opacity: 0.965; }
+      0%,18%,22%,25%,53%,57%,100% { opacity: 1; }
+      20%,24%,55% { opacity: 0.965; }
     }
-    @keyframes cursor {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
-    }
+    @keyframes cursor { 0%,100%{opacity:1} 50%{opacity:0} }
 
-    html, body { min-height: 100vh; background: var(--bg); }
+    html,body { min-height:100vh; background:var(--bg); }
 
     body {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      padding: 4rem 1.5rem 6rem;
-      font-family: 'VT323', monospace;
-      font-size: 28px;
-      line-height: 1.75;
-      color: var(--amber);
-      animation: flicker 14s infinite;
+      position:relative; display:flex; justify-content:center;
+      padding:4rem 1.5rem 6rem;
+      font-family:'VT323',monospace; font-size:28px; line-height:1.75;
+      color:var(--amber); animation:flicker 14s infinite;
     }
-
     body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.13) 2px, rgba(0,0,0,0.13) 4px);
-      pointer-events: none; z-index: 10;
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:10;
+      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.13) 2px,rgba(0,0,0,0.13) 4px);
     }
     body::after {
-      content: '';
-      position: fixed; inset: 0;
-      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
-      pointer-events: none; z-index: 11;
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:11;
+      background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.6) 100%);
     }
 
-    /* ── starfield ── */
-    #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    #starfield { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
-    /* ── boot overlay ── */
     #boot-overlay {
-      position: fixed; inset: 0; z-index: 100;
-      background: var(--bg);
-      padding: 3rem 3.5rem;
-      font-family: 'VT323', monospace;
-      font-size: 22px;
-      color: var(--amber);
-      text-shadow: 0 0 8px var(--amber-glow);
-      transition: opacity 0.9s;
-      pointer-events: none;
+      position:fixed; inset:0; z-index:100; background:var(--bg);
+      padding:3rem 3.5rem; pointer-events:none;
+      font-family:'VT323',monospace; font-size:22px; color:var(--amber);
+      text-shadow:0 0 8px var(--amber-glow); transition:opacity 0.8s;
     }
-    #boot-text { white-space: pre-wrap; line-height: 1.6; }
+    #boot-text { white-space:pre-wrap; line-height:1.6; }
 
-    /* ── screen ── */
-    .screen { position: relative; max-width: 950px; width: 100%; padding: 3rem 2.5rem; }
+    .screen { position:relative; max-width:950px; width:100%; padding:3rem 2.5rem; }
 
-    /* ── clock ── */
-    #clock {
-      white-space: pre;
-      font-size: 0.5em;
-      line-height: 1.05;
-      margin-bottom: 1.8rem;
-      opacity: 0.65;
-      text-shadow: 0 0 10px var(--amber-glow);
-    }
+    #content { position:relative; z-index:1; }
+    #content * { text-shadow:0 0 7px var(--amber-glow),0 0 2px rgba(232,160,0,0.4); }
+    #content h1 { font-size:2.4em; letter-spacing:0.04em; margin-bottom:0.3em; text-shadow:0 0 14px var(--amber-glow),0 0 4px rgba(232,160,0,0.5); }
+    #content h2 { font-size:1.5em; margin:1.6em 0 0.4em; color:var(--amber-bright); letter-spacing:0.03em; }
+    #content h3 { font-size:1.2em; margin:1.2em 0 0.3em; }
+    #content p  { margin-bottom:0.9em; opacity:0.9; }
+    #content a  { color:var(--amber-bright); text-decoration:none; border-bottom:1px solid var(--amber-dim); transition:border-color 0.1s; }
+    #content a:hover { border-bottom-color:var(--amber-bright); }
+    #content ul,#content ol { margin:0 0 0.9em 1.4em; }
+    #content li { margin-bottom:0.15em; }
+    #content hr { border:none; border-top:1px solid var(--amber-dim); margin:1.6em 0; opacity:0.45; }
+    #content strong { color:var(--amber-bright); }
+    #content em { opacity:0.75; font-style:normal; }
+    #content code { font-family:'VT323',monospace; background:rgba(232,160,0,0.07); border:1px solid var(--amber-dim); padding:0 0.35em; }
+    #content pre  { background:rgba(232,160,0,0.05); border:1px solid var(--amber-dim); padding:1em 1.2em; margin-bottom:1em; overflow-x:auto; }
+    #content pre code { background:none; border:none; padding:0; }
+    #content blockquote { border-left:2px solid var(--amber-dim); padding-left:1em; opacity:0.7; }
+    #content:empty::after { content:'_'; animation:cursor 1s step-end infinite; text-shadow:0 0 7px var(--amber-glow); }
 
-    /* ── content ── */
-    #content { position: relative; z-index: 1; }
-    #content * { text-shadow: 0 0 7px var(--amber-glow), 0 0 2px rgba(232,160,0,0.4); }
-    #content h1 { font-size: 2.4em; letter-spacing: 0.04em; margin-bottom: 0.3em; text-shadow: 0 0 14px var(--amber-glow), 0 0 4px rgba(232,160,0,0.5); }
-    #content h2 { font-size: 1.5em; margin: 1.6em 0 0.4em; color: var(--amber-bright); letter-spacing: 0.03em; text-shadow: 0 0 10px var(--amber-glow), 0 0 3px rgba(255,183,0,0.5); }
-    #content h3 { font-size: 1.2em; margin: 1.2em 0 0.3em; }
-    #content p  { margin-bottom: 0.9em; opacity: 0.9; }
-    #content a  { color: var(--amber-bright); text-decoration: none; border-bottom: 1px solid var(--amber-dim); transition: border-color 0.1s; }
-    #content a:hover { border-bottom-color: var(--amber-bright); text-shadow: 0 0 16px var(--amber-glow), 0 0 6px rgba(255,183,0,0.6); }
-    #content ul, #content ol { margin: 0 0 0.9em 1.4em; }
-    #content li { margin-bottom: 0.15em; }
-    #content hr { border: none; border-top: 1px solid var(--amber-dim); margin: 1.6em 0; opacity: 0.45; }
-    #content strong { color: var(--amber-bright); }
-    #content em { opacity: 0.75; font-style: normal; }
-    #content code { font-family: 'VT323', monospace; background: rgba(232,160,0,0.07); border: 1px solid var(--amber-dim); padding: 0 0.35em; }
-    #content pre  { background: rgba(232,160,0,0.05); border: 1px solid var(--amber-dim); padding: 1em 1.2em; margin-bottom: 1em; overflow-x: auto; }
-    #content pre code { background: none; border: none; padding: 0; }
-    #content blockquote { border-left: 2px solid var(--amber-dim); padding-left: 1em; opacity: 0.7; }
-    #content:empty::after { content: '_'; animation: cursor 1s step-end infinite; text-shadow: 0 0 7px var(--amber-glow); }
-
-    /* ── oscilloscope ── */
     #oscilloscope {
-      white-space: pre;
-      font-size: 0.75em;
-      line-height: 1;
-      margin: 1.6rem 0 0;
-      opacity: 0.45;
-      letter-spacing: 0.03em;
-      text-shadow: 0 0 4px var(--amber-glow);
+      white-space:pre; font-size:0.75em; line-height:1;
+      margin:1.6rem 0 0; opacity:0.4; letter-spacing:0.03em;
+      text-shadow:0 0 4px var(--amber-glow);
     }
 
-    /* ── globe ── */
     #globe {
-      white-space: pre;
-      font-size: 0.58em;
-      line-height: 1.12;
-      text-align: center;
-      margin: 0.4rem 0 1.2rem;
-      opacity: 0.75;
-      text-shadow: 0 0 7px var(--amber-glow);
+      white-space:pre; font-size:0.54em; line-height:1.1;
+      text-align:center; margin:0.6rem 0 1.2rem;
+      opacity:0.85; text-shadow:0 0 6px var(--amber-glow);
     }
 
-    /* ── map ── */
-    #map-wrap { position: relative; z-index: 1; margin-top: 1rem; border-top: 1px solid rgba(107,66,0,0.4); padding-top: 1.2rem; }
-    #map-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; font-size: 0.78em; letter-spacing: 0.18em; opacity: 0.6; text-shadow: 0 0 6px var(--amber-glow); }
-    #map-coords { opacity: 1; letter-spacing: 0.1em; }
-    #map { width: 100%; display: block; border: 1px solid rgba(107,66,0,0.3); }
-    #map-footer { display: flex; justify-content: space-between; margin-top: 0.4rem; font-size: 0.72em; opacity: 0.45; letter-spacing: 0.12em; }
+    #map-wrap { position:relative; z-index:1; margin-top:1rem; border-top:1px solid rgba(107,66,0,0.4); padding-top:1.2rem; }
+    #map-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.5rem; font-size:0.78em; letter-spacing:0.18em; opacity:0.6; text-shadow:0 0 6px var(--amber-glow); }
+    #map-coords { opacity:1; letter-spacing:0.1em; }
+    #map { width:100%; display:block; border:1px solid rgba(107,66,0,0.3); }
+    #map-footer { display:flex; justify-content:space-between; margin-top:0.4rem; font-size:0.72em; opacity:0.45; letter-spacing:0.12em; }
     #map-tooltip {
-      position: absolute; display: none; pointer-events: none; z-index: 20;
-      background: #0c0800; border: 1px solid var(--amber-dim);
-      padding: 0.5em 0.8em; max-width: 220px; line-height: 1.4;
-      box-shadow: 0 0 12px rgba(232,160,0,0.2), inset 0 0 20px rgba(0,0,0,0.4);
+      position:absolute; display:none; pointer-events:none; z-index:20;
+      background:#0c0800; border:1px solid var(--amber-dim);
+      padding:0.5em 0.8em; max-width:220px; line-height:1.4;
+      box-shadow:0 0 12px rgba(232,160,0,0.2),inset 0 0 20px rgba(0,0,0,0.4);
     }
-    #map-tooltip .tt-name { color: var(--amber-bright); font-size: 0.9em; letter-spacing: 0.12em; text-shadow: 0 0 8px var(--amber-glow); display: block; margin-bottom: 0.15em; }
-    #map-tooltip .tt-text { color: var(--amber); font-size: 0.78em; opacity: 0.85; text-shadow: 0 0 5px var(--amber-glow); }
+    #map-tooltip .tt-name { color:var(--amber-bright); font-size:0.9em; letter-spacing:0.12em; text-shadow:0 0 8px var(--amber-glow); display:block; margin-bottom:0.15em; }
+    #map-tooltip .tt-text { color:var(--amber); font-size:0.78em; opacity:0.85; }
   </style>
 </head>
 <body>
@@ -148,7 +105,6 @@
   <div id="boot-overlay"><pre id="boot-text"></pre></div>
 
   <div class="screen">
-    <pre id="clock"></pre>
     <div id="content"></div>
     <pre id="oscilloscope"></pre>
     <pre id="globe"></pre>
@@ -167,405 +123,370 @@
     </div>
   </div>
 
-  <script>
-  // ═══════════════════════════════════════════════
-  // BOOT SEQUENCE
-  // ═══════════════════════════════════════════════
-  (function () {
-    const overlay  = document.getElementById('boot-overlay');
-    const bootText = document.getElementById('boot-text');
-    const lines = [
-      '> BIOS v2.4.1 ................. OK',
-      '> memory check (640K) ......... OK',
-      '> initializing display ........ OK',
-      '> loading kernel modules ...... OK',
-      '> mounting filesystem ......... OK',
-      '> starting kremen.io ..........',
-      '',
-      'welcome.',
-    ];
-    let li = 0, ci = 0, text = '';
-    function tick() {
-      if (li >= lines.length) {
-        setTimeout(() => {
-          overlay.style.opacity = '0';
-          setTimeout(() => { overlay.style.display = 'none'; startGlitch(); }, 900);
-        }, 700);
-        return;
-      }
-      const line = lines[li];
-      if (ci < line.length) {
-        text += line[ci++];
-        bootText.textContent = text + '█';
-        setTimeout(tick, 18 + Math.random() * 14);
-      } else {
-        text += '\n';
-        bootText.textContent = text + '█';
-        li++; ci = 0;
-        setTimeout(tick, li < lines.length ? 180 : 500);
-      }
+<script>
+// ── shared data ────────────────────────────────────
+const CITIES = [
+  { name:'Vancouver',   lat:49.28,   lon:-123.12, tooltip:'' },
+  { name:'Bern',        lat:46.95,   lon:  7.45,  tooltip:'' },
+  { name:'Singapore',   lat: 1.35,   lon:103.82,  tooltip:'' },
+  { name:'Cannes',      lat:43.55,   lon:  7.02,  tooltip:'' },
+  { name:'Tokyo',       lat:35.68,   lon:139.65,  tooltip:'' },
+  { name:'Yosemite',    lat:37.865,  lon:-119.54, tooltip:'' },
+  { name:'Los Angeles', lat:34.052,  lon:-118.24, tooltip:'' },
+];
+
+window.worldData = fetch('countries-110m.json').then(r => r.json());
+
+// ── boot sequence ──────────────────────────────────
+(function(){
+  const overlay = document.getElementById('boot-overlay');
+  const out     = document.getElementById('boot-text');
+  const lines   = ['> POST ......... OK','> fs ........... OK','> starting .....','','welcome.'];
+  let li=0, ci=0, text='';
+  function tick(){
+    if(li>=lines.length){
+      setTimeout(()=>{ overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; startGlitch(); },800); },400);
+      return;
     }
-    tick();
-  })();
+    const line=lines[li];
+    if(ci<line.length){ text+=line[ci++]; out.textContent=text+'█'; setTimeout(tick,7+Math.random()*6); }
+    else{ text+='\n'; out.textContent=text+'█'; li++;ci=0; setTimeout(tick,60); }
+  }
+  tick();
+})();
 
-  // ═══════════════════════════════════════════════
-  // STARFIELD
-  // ═══════════════════════════════════════════════
-  (function () {
-    const canvas = document.getElementById('starfield');
-    const ctx    = canvas.getContext('2d');
-    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    resize();
-    window.addEventListener('resize', resize);
-
-    const CHARS = ['.', '·', '+', '·', '.'];
-    const stars = Array.from({ length: 70 }, () => ({
-      x: Math.random(), y: Math.random(),
-      vx: (Math.random() - 0.5) * 0.00015,
-      vy: (Math.random() - 0.5) * 0.00015,
-      ch: CHARS[Math.floor(Math.random() * CHARS.length)],
-      op: Math.random() * 0.25 + 0.06,
-      size: Math.floor(Math.random() * 3) + 10,
-    }));
-
-    function draw() {
-      const W = canvas.width, H = canvas.height;
-      ctx.clearRect(0, 0, W, H);
-      ctx.font = '14px VT323, monospace';
-      for (const s of stars) {
-        s.x = (s.x + s.vx + 1) % 1;
-        s.y = (s.y + s.vy + 1) % 1;
-        ctx.fillStyle = `rgba(232,160,0,${s.op})`;
-        ctx.font = `${s.size}px VT323, monospace`;
-        ctx.fillText(s.ch, s.x * W, s.y * H);
-      }
-      requestAnimationFrame(draw);
+// ── starfield ──────────────────────────────────────
+(function(){
+  const canvas=document.getElementById('starfield');
+  const ctx=canvas.getContext('2d');
+  const resize=()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; };
+  resize(); window.addEventListener('resize',resize);
+  const CHARS=['.','·','+','·','.'];
+  const stars=Array.from({length:65},()=>({
+    x:Math.random(), y:Math.random(),
+    vx:(Math.random()-0.5)*0.00012, vy:(Math.random()-0.5)*0.00012,
+    ch:CHARS[Math.floor(Math.random()*CHARS.length)],
+    op:Math.random()*0.22+0.05,
+    sz:Math.floor(Math.random()*3)+10,
+  }));
+  function draw(){
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    for(const s of stars){
+      s.x=(s.x+s.vx+1)%1; s.y=(s.y+s.vy+1)%1;
+      ctx.fillStyle=`rgba(232,160,0,${s.op})`;
+      ctx.font=`${s.sz}px VT323,monospace`;
+      ctx.fillText(s.ch,s.x*W,s.y*H);
     }
-    draw();
-  })();
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
 
-  // ═══════════════════════════════════════════════
-  // ASCII CLOCK
-  // ═══════════════════════════════════════════════
-  (function () {
-    const el = document.getElementById('clock');
-    const D = {
-      '0': ['▄██▄','█  █','█  █','█  █','▀██▀'],
-      '1': [' ██ ',' ██ ',' ██ ',' ██ ',' ██ '],
-      '2': ['▄██▄','   █','▄██▄','█   ','████'],
-      '3': ['▄██▄','   █',' ██▄','   █','▀██▀'],
-      '4': ['█  █','█  █','████','   █','   █'],
-      '5': ['████','█   ','▀██▄','   █','▀██▀'],
-      '6': ['▄██▄','█   ','███▄','█  █','▀██▀'],
-      '7': ['████','   █','  █ ',' █  ','█   '],
-      '8': ['▄██▄','█  █','▄██▄','█  █','▀██▀'],
-      '9': ['▄██▄','█  █','▀███','   █','▀██▀'],
-      ':': ['    ',' ▪  ','    ',' ▪  ','    '],
-    };
-    function render() {
-      const n = new Date();
-      const s = `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}:${String(n.getSeconds()).padStart(2,'0')}`;
-      const rows = ['','','','',''];
-      for (const c of s) { const p = D[c]; if (p) for (let r=0;r<5;r++) rows[r] += p[r]+' '; }
-      el.textContent = rows.join('\n');
+// ── oscilloscope ────────────────────────────────────
+(function(){
+  const el=document.getElementById('oscilloscope');
+  const BARS='▁▂▃▄▅▆▇█';
+  let t=0;
+  function render(){
+    const W=Math.floor((el.parentElement.clientWidth||600)/16.5);
+    let line='';
+    for(let i=0;i<W;i++){
+      const v=Math.sin(i/W*Math.PI*6-t)*0.4+Math.sin(i/W*Math.PI*3-t*0.7)*0.4+0.2;
+      line+=BARS[Math.max(0,Math.min(7,Math.round(v*7)))];
     }
-    render();
-    setInterval(render, 1000);
-  })();
+    el.textContent=line; t+=0.08;
+    requestAnimationFrame(render);
+  }
+  render();
+})();
 
-  // ═══════════════════════════════════════════════
-  // OSCILLOSCOPE
-  // ═══════════════════════════════════════════════
-  (function () {
-    const el    = document.getElementById('oscilloscope');
-    const BARS  = '▁▂▃▄▅▆▇█';
-    let t = 0;
-    function render() {
-      const W = Math.floor(el.parentElement.clientWidth / 16.5);
-      let line = '';
-      for (let i = 0; i < W; i++) {
-        const v = Math.sin(i / W * Math.PI * 6 - t) * 0.4
-                + Math.sin(i / W * Math.PI * 3 - t * 0.7) * 0.4
-                + 0.2;
-        line += BARS[Math.max(0, Math.min(7, Math.round(v * 7)))];
-      }
-      el.textContent = line;
-      t += 0.08;
-      requestAnimationFrame(render);
+// ── globe (ray-cast, adamsky style) ────────────────
+(async function(){
+  const el=document.getElementById('globe');
+
+  // Grid size: chars are ~2× taller than wide, so COLS ≈ 2×ROWS for circular globe
+  const COLS=54, ROWS=26;
+  const SX=COLS*0.46; // half-width in char units  (≈ physical radius x)
+  const SY=ROWS*0.90; // half-height in char units (≈ physical radius y, *2 for aspect)
+  // For a circle: SX*charW = SY/2*charH → SX = SY/2 * (charH/charW≈2) → SX≈SY ✓
+
+  // Palette: space=dark → @ = bright (18 levels, matches adamsky)
+  const PAL=' .:;,wioOgLXHWYV@';
+
+  // Light direction (screen-space: x right, y up, z toward camera)
+  const lx=0.4, ly=0.6, lz=0.7;
+  const lm=Math.sqrt(lx*lx+ly*ly+lz*lz);
+  const LX=lx/lm, LY=ly/lm, LZ=lz/lm;
+
+  // Pre-compute land texture via canvas rasterization
+  const world=await window.worldData;
+  const land=topojson.feature(world,world.objects.land);
+  const TW=360, TH=180;
+  const tc=document.createElement('canvas'); tc.width=TW; tc.height=TH;
+  const tx=tc.getContext('2d');
+  tx.fillStyle='#000'; tx.fillRect(0,0,TW,TH);
+  tx.fillStyle='#fff';
+  function texRing(ring){
+    if(!ring.length)return;
+    let pLon=ring[0][0];
+    tx.moveTo((pLon+180)/360*TW,(90-ring[0][1])/180*TH);
+    for(let i=1;i<ring.length;i++){
+      const [lon,lat]=ring[i];
+      if(Math.abs(lon-pLon)>180) tx.moveTo((lon+180)/360*TW,(90-lat)/180*TH);
+      else tx.lineTo((lon+180)/360*TW,(90-lat)/180*TH);
+      pLon=lon;
     }
-    render();
-  })();
+  }
+  tx.beginPath();
+  const geom=land.geometry||land;
+  if(geom.type==='MultiPolygon') for(const p of geom.coordinates) texRing(p[0]);
+  else if(geom.type==='Polygon') texRing(geom.coordinates[0]);
+  tx.fill();
+  const img=tx.getImageData(0,0,TW,TH).data;
 
-  // ═══════════════════════════════════════════════
-  // ASCII GLOBE
-  // ═══════════════════════════════════════════════
-  (function () {
-    const el = document.getElementById('globe');
-    const COLS = 52, ROWS = 22;
-    const DEPTH_CHARS = ' ·.:+oO0@';
-    let t = 0;
-
-    function render() {
-      const buf = new Array(COLS * ROWS).fill(' ');
-      const zbuf = new Array(COLS * ROWS).fill(-Infinity);
-
-      // Latitude lines
-      for (let latD = -80; latD <= 80; latD += 20) {
-        const lat = latD * Math.PI / 180;
-        for (let lonD = 0; lonD < 360; lonD += 1.5) {
-          const lon = lonD * Math.PI / 180;
-          const x = Math.cos(lat) * Math.cos(lon + t);
-          const y = Math.sin(lat);
-          const z = Math.cos(lat) * Math.sin(lon + t);
-          if (z <= 0) continue;
-          const px = Math.round(x * COLS * 0.42 + COLS / 2);
-          const py = Math.round(-y * ROWS * 0.88 + ROWS / 2);
-          if (px < 0 || px >= COLS || py < 0 || py >= ROWS) continue;
-          const idx = py * COLS + px;
-          if (z > zbuf[idx]) {
-            zbuf[idx] = z;
-            const ci = Math.floor(z * (DEPTH_CHARS.length - 1));
-            buf[idx] = DEPTH_CHARS[ci];
-          }
-        }
-      }
-
-      // Longitude lines
-      for (let lonD = 0; lonD < 360; lonD += 20) {
-        const lon = lonD * Math.PI / 180;
-        for (let latD = -90; latD <= 90; latD += 1) {
-          const lat = latD * Math.PI / 180;
-          const x = Math.cos(lat) * Math.cos(lon + t);
-          const y = Math.sin(lat);
-          const z = Math.cos(lat) * Math.sin(lon + t);
-          if (z <= 0) continue;
-          const px = Math.round(x * COLS * 0.42 + COLS / 2);
-          const py = Math.round(-y * ROWS * 0.88 + ROWS / 2);
-          if (px < 0 || px >= COLS || py < 0 || py >= ROWS) continue;
-          const idx = py * COLS + px;
-          if (z > zbuf[idx]) {
-            zbuf[idx] = z;
-            const ci = Math.floor(z * (DEPTH_CHARS.length - 1));
-            buf[idx] = DEPTH_CHARS[ci];
-          }
-        }
-      }
-
-      el.textContent = Array.from({ length: ROWS }, (_, r) =>
-        buf.slice(r * COLS, (r + 1) * COLS).join('')
-      ).join('\n');
-
-      t += 0.007;
-      requestAnimationFrame(render);
-    }
-    render();
-  })();
-
-  // ═══════════════════════════════════════════════
-  // SIGNAL CORRUPTION
-  // ═══════════════════════════════════════════════
-  function startGlitch() {
-    const NOISE = '!@#$%^&*<>?/|[]{}=~`░▒▓';
-    function glitch() {
-      const content = document.getElementById('content');
-      if (!content) return schedule();
-      const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT);
-      const nodes = [];
-      let n;
-      while ((n = walker.nextNode())) if (n.textContent.trim().length > 4) nodes.push(n);
-      if (!nodes.length) return schedule();
-      const target = nodes[Math.floor(Math.random() * nodes.length)];
-      const orig   = target.textContent;
-      const start  = Math.floor(Math.random() * (orig.length - 4));
-      const len    = Math.floor(Math.random() * 5) + 2;
-      let glitched = orig.slice(0, start);
-      for (let i = 0; i < len; i++) glitched += NOISE[Math.floor(Math.random() * NOISE.length)];
-      glitched += orig.slice(start + len);
-      target.textContent = glitched;
-      setTimeout(() => { target.textContent = orig; }, 60 + Math.random() * 80);
-      schedule();
-    }
-    function schedule() { setTimeout(glitch, 2500 + Math.random() * 4000); }
-    schedule();
+  function isLand(lon,lat){ // lon,lat in radians
+    const ttx=((Math.floor((lon/Math.PI+1)*TW/2)%TW)+TW)%TW;
+    const tty=Math.max(0,Math.min(TH-1,Math.floor((Math.PI/2-lat)/Math.PI*TH)));
+    return img[(tty*TW+ttx)*4]>128;
   }
 
-  // ═══════════════════════════════════════════════
-  // CONTENT LOADER
-  // ═══════════════════════════════════════════════
-  marked.setOptions({ breaks: true });
-  fetch('content.md')
-    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
-    .then(text => { document.getElementById('content').innerHTML = marked.parse(text); })
-    .catch(err => { document.getElementById('content').textContent = '// error loading content — ' + err.message; });
+  // City dots in radians
+  const cityDots=CITIES.map(c=>({
+    name:c.name,
+    latR:c.lat*Math.PI/180,
+    lonR:c.lon*Math.PI/180,
+  }));
 
-  // ═══════════════════════════════════════════════
-  // MAP
-  // ═══════════════════════════════════════════════
-  (async function () { try {
-    const canvas      = document.getElementById('map');
-    const ctx         = canvas.getContext('2d');
-    const wrap        = document.getElementById('map-wrap');
-    const coordsEl    = document.getElementById('map-coords');
-    const cityLabelEl = document.getElementById('map-city-label');
-    const tooltip     = document.getElementById('map-tooltip');
-    const ttName      = tooltip.querySelector('.tt-name');
-    const ttText      = tooltip.querySelector('.tt-text');
-    const mapHeader   = document.getElementById('map-header');
+  let t=0;
+  function render(){
+    const cosT=Math.cos(t), sinT=Math.sin(t);
+    const buf=new Array(COLS*ROWS).fill(' ');
 
-    const W = wrap.clientWidth;
-    const H = Math.round(W * 0.54);
-    const DPR = window.devicePixelRatio || 1;
-    canvas.width = W * DPR; canvas.height = H * DPR;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-    ctx.scale(DPR, DPR);
+    for(let yi=0;yi<ROWS;yi++){
+      for(let xi=0;xi<COLS;xi++){
+        // Ray through this cell
+        const sx=(xi-COLS/2)/SX; // [-1,1] at sphere edge
+        const sy=-(yi-ROWS/2)/(SY/2); // negated: top of grid = north
+        const disc=1-sx*sx-sy*sy;
+        if(disc<0)continue;
+        const sz=Math.sqrt(disc); // z faces camera
 
-    const AMBER        = '#e8a000';
-    const AMBER_BRIGHT = '#ffb700';
-    const LAND_FILL    = 'rgba(232,160,0,0.09)';
-    const LAND_STROKE  = 'rgba(232,160,0,0.6)';
-    const BORDER       = 'rgba(232,160,0,0.2)';
-    const GRID         = 'rgba(232,160,0,0.1)';
+        // Un-rotate Y by -t to get original sphere coords
+        const ox=sx*cosT-sz*sinT;
+        const oy=sy;
+        const oz=sx*sinT+sz*cosT;
 
-    const cities = [
-      { name: 'Vancouver',   lat: 49.28,  lon: -123.12, tooltip: '' },
-      { name: 'Bern',        lat: 46.95,  lon:    7.45, tooltip: '' },
-      { name: 'Singapore',   lat:  1.35,  lon:  103.82, tooltip: '' },
-      { name: 'Cannes',      lat: 43.55,  lon:    7.02, tooltip: '' },
-      { name: 'Tokyo',       lat: 35.68,  lon:  139.65, tooltip: '' },
-      { name: 'Yosemite',    lat: 37.865, lon: -119.54, tooltip: '' },
-      { name: 'Los Angeles', lat: 34.052, lon: -118.24, tooltip: '' },
-    ];
+        // Spherical coords
+        const lat=Math.asin(Math.max(-1,Math.min(1,oy)));
+        const lon=Math.atan2(ox,oz);
 
-    const LON_MIN = -165, LON_MAX = 170, LAT_MAX = 76, LAT_MIN = -57;
-    const LON_SPAN = LON_MAX - LON_MIN, LAT_SPAN = LAT_MAX - LAT_MIN;
+        // Lighting (surface normal in screen-space is [sx,sy,sz])
+        const dot=Math.max(0,sx*LX+sy*LY+sz*LZ);
 
-    function project(lon, lat)  { return [(lon - LON_MIN) / LON_SPAN * W, (LAT_MAX - lat) / LAT_SPAN * H]; }
-    function unproject(x, y)    { return [x / W * LON_SPAN + LON_MIN, LAT_MAX - y / H * LAT_SPAN]; }
-
-    function tracePath(geom) {
-      if (!geom) return;
-      if      (geom.type === 'Polygon')            geom.coordinates.forEach(traceRing);
-      else if (geom.type === 'MultiPolygon')       geom.coordinates.forEach(p => p.forEach(traceRing));
-      else if (geom.type === 'LineString')         traceLine(geom.coordinates);
-      else if (geom.type === 'MultiLineString')    geom.coordinates.forEach(traceLine);
-      else if (geom.type === 'GeometryCollection') geom.geometries.forEach(tracePath);
-      else if (geom.type === 'Feature')            tracePath(geom.geometry);
-      else if (geom.type === 'FeatureCollection')  geom.features.forEach(tracePath);
-    }
-    function traceRing(coords) {
-      if (!coords.length) return;
-      ctx.moveTo(...project(coords[0][0], coords[0][1]));
-      let pLon = coords[0][0];
-      for (let i = 1; i < coords.length; i++) {
-        const [lon, lat] = coords[i], [x, y] = project(lon, lat);
-        if (Math.abs(lon - pLon) > 180) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        pLon = lon;
-      }
-    }
-    function traceLine(coords) {
-      if (!coords.length) return;
-      ctx.moveTo(...project(coords[0][0], coords[0][1]));
-      let pLon = coords[0][0];
-      for (let i = 1; i < coords.length; i++) {
-        const [lon, lat] = coords[i], [x, y] = project(lon, lat);
-        if (Math.abs(lon - pLon) > 180) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        pLon = lon;
+        const onLand=isLand(lon,lat);
+        let ci;
+        if(onLand){
+          ci=Math.max(2,Math.round(dot*(PAL.length-1)));
+        } else {
+          ci=dot>0.55?1:0;
+        }
+        buf[yi*COLS+xi]=PAL[ci];
       }
     }
 
-    const world       = await fetch('countries-110m.json').then(r => r.json());
-    const land        = topojson.feature(world, world.objects.land);
-    const bordersMesh = topojson.mesh(world, world.objects.countries, (a, b) => a !== b);
-
-    const cityDots = cities.map(c => { const [x, y] = project(c.lon, c.lat); return { ...c, x, y }; });
-
-    function fillGeom(geom) {
-      if (!geom) return;
-      if (geom.type === 'Polygon') {
-        ctx.beginPath(); traceRing(geom.coordinates[0]); ctx.fillStyle = LAND_FILL; ctx.fill();
-      } else if (geom.type === 'MultiPolygon') {
-        geom.coordinates.forEach(poly => { ctx.beginPath(); traceRing(poly[0]); ctx.fillStyle = LAND_FILL; ctx.fill(); });
-      } else if (geom.type === 'Feature') { fillGeom(geom.geometry); }
-      else if (geom.type === 'FeatureCollection') { geom.features.forEach(f => fillGeom(f.geometry)); }
+    // City dots
+    for(const c of cityDots){
+      const px=Math.sin(c.lonR)*Math.cos(c.latR);
+      const py=Math.sin(c.latR);
+      const pz=Math.cos(c.lonR)*Math.cos(c.latR);
+      // Rotate by t (Y-axis)
+      const rx= px*cosT+pz*sinT;
+      const ry= py;
+      const rz=-px*sinT+pz*cosT;
+      if(rz<=0.05)continue; // back hemisphere
+      const gxi=Math.round(rx*SX+COLS/2);
+      const gyi=Math.round(-ry*(SY/2)+ROWS/2);
+      if(gxi>=0&&gxi<COLS&&gyi>=0&&gyi<ROWS){
+        buf[gyi*COLS+gxi]='X';
+        // halo
+        if(gxi>0) buf[gyi*COLS+gxi-1]=buf[gyi*COLS+gxi-1]===' '?'.':buf[gyi*COLS+gxi-1];
+        if(gxi<COLS-1) buf[gyi*COLS+gxi+1]=buf[gyi*COLS+gxi+1]===' '?'.':buf[gyi*COLS+gxi+1];
+      }
     }
 
-    let hoveredCity = null, t = 0;
+    el.textContent=Array.from({length:ROWS},(_,r)=>buf.slice(r*COLS,(r+1)*COLS).join('')).join('\n');
+    t+=0.004;
+    requestAnimationFrame(render);
+  }
+  render();
+})();
 
-    function draw() {
-      ctx.clearRect(0, 0, W, H);
-      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
+// ── signal corruption ──────────────────────────────
+function startGlitch(){
+  const NOISE='!@#$%^&*<>?/|[]{}=~`░▒▓';
+  function glitch(){
+    const el=document.getElementById('content');
+    if(!el)return sched();
+    const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
+    const nodes=[]; let n;
+    while((n=walker.nextNode()))if(n.textContent.trim().length>4)nodes.push(n);
+    if(!nodes.length)return sched();
+    const target=nodes[Math.floor(Math.random()*nodes.length)];
+    const orig=target.textContent;
+    const start=Math.floor(Math.random()*(orig.length-4));
+    const len=Math.floor(Math.random()*5)+2;
+    let g=orig.slice(0,start);
+    for(let i=0;i<len;i++)g+=NOISE[Math.floor(Math.random()*NOISE.length)];
+    target.textContent=g+orig.slice(start+len);
+    setTimeout(()=>{ target.textContent=orig; },60+Math.random()*80);
+    sched();
+  }
+  function sched(){ setTimeout(glitch,2500+Math.random()*4000); }
+  sched();
+}
 
-      // Grid
-      ctx.beginPath();
-      for (let lon = -150; lon < 180; lon += 30) {
-        const [x0, y0] = project(lon, LAT_MAX), [, y1] = project(lon, LAT_MIN);
-        ctx.moveTo(x0, y0); ctx.lineTo(x0, y1);
-      }
-      ctx.strokeStyle = GRID; ctx.lineWidth = 0.4; ctx.shadowBlur = 0; ctx.stroke();
+// ── content loader ─────────────────────────────────
+marked.setOptions({breaks:true});
+fetch('content.md')
+  .then(r=>{ if(!r.ok)throw new Error(r.status); return r.text(); })
+  .then(text=>{ document.getElementById('content').innerHTML=marked.parse(text); })
+  .catch(err=>{ document.getElementById('content').textContent='// error: '+err.message; });
 
-      // Land
-      fillGeom(land);
-      ctx.beginPath(); tracePath(land);
-      ctx.strokeStyle = LAND_STROKE; ctx.lineWidth = 0.6;
-      ctx.shadowColor = AMBER; ctx.shadowBlur = 5; ctx.stroke(); ctx.shadowBlur = 0;
+// ── map ────────────────────────────────────────────
+(async function(){ try{
+  const canvas=document.getElementById('map');
+  const ctx=canvas.getContext('2d');
+  const wrap=document.getElementById('map-wrap');
+  const coordsEl=document.getElementById('map-coords');
+  const cityLabelEl=document.getElementById('map-city-label');
+  const tooltip=document.getElementById('map-tooltip');
+  const ttName=tooltip.querySelector('.tt-name');
+  const ttText=tooltip.querySelector('.tt-text');
+  const mapHeader=document.getElementById('map-header');
 
-      // Borders
-      ctx.beginPath(); tracePath(bordersMesh);
-      ctx.strokeStyle = BORDER; ctx.lineWidth = 0.4; ctx.stroke();
+  const W=wrap.clientWidth, H=Math.round(W*0.54);
+  const DPR=window.devicePixelRatio||1;
+  canvas.width=W*DPR; canvas.height=H*DPR;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  ctx.scale(DPR,DPR);
 
-      // Dots
-      t += 0.022;
-      for (const city of cityDots) {
-        const isHover = hoveredCity === city.name;
-        const pulse = Math.sin(t + city.x * 0.05) * 0.5 + 0.5;
-        ctx.beginPath(); ctx.arc(city.x, city.y, 5 + pulse * 6, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255,183,0,${(0.12 + pulse * 0.18).toFixed(2)})`; ctx.lineWidth = 0.8; ctx.shadowBlur = 0; ctx.stroke();
-        ctx.beginPath(); ctx.arc(city.x, city.y, isHover ? 4.5 : 3, 0, Math.PI * 2);
-        ctx.fillStyle = AMBER_BRIGHT; ctx.shadowColor = AMBER_BRIGHT; ctx.shadowBlur = isHover ? 22 : 10; ctx.fill(); ctx.shadowBlur = 0;
-      }
+  const AMBER='#e8a000', AMBER_BRIGHT='#ffb700';
+  const LAND_FILL='rgba(232,160,0,0.09)', LAND_STROKE='rgba(232,160,0,0.6)';
+  const BORDER='rgba(232,160,0,0.2)', GRID='rgba(232,160,0,0.1)';
 
-      ctx.restore();
-      requestAnimationFrame(draw);
+  const LON_MIN=-165,LON_MAX=170,LAT_MAX=76,LAT_MIN=-57;
+  const LON_SPAN=LON_MAX-LON_MIN, LAT_SPAN=LAT_MAX-LAT_MIN;
+  function project(lon,lat){ return [(lon-LON_MIN)/LON_SPAN*W,(LAT_MAX-lat)/LAT_SPAN*H]; }
+  function unproject(x,y){ return [x/W*LON_SPAN+LON_MIN, LAT_MAX-y/H*LAT_SPAN]; }
+
+  function tracePath(geom){
+    if(!geom)return;
+    if(geom.type==='Polygon') geom.coordinates.forEach(traceRing);
+    else if(geom.type==='MultiPolygon') geom.coordinates.forEach(p=>p.forEach(traceRing));
+    else if(geom.type==='LineString') traceLine(geom.coordinates);
+    else if(geom.type==='MultiLineString') geom.coordinates.forEach(traceLine);
+    else if(geom.type==='GeometryCollection') geom.geometries.forEach(tracePath);
+    else if(geom.type==='Feature') tracePath(geom.geometry);
+    else if(geom.type==='FeatureCollection') geom.features.forEach(tracePath);
+  }
+  function traceRing(coords){
+    if(!coords.length)return;
+    ctx.moveTo(...project(coords[0][0],coords[0][1]));
+    let pLon=coords[0][0];
+    for(let i=1;i<coords.length;i++){
+      const[lon,lat]=coords[i],[x,y]=project(lon,lat);
+      if(Math.abs(lon-pLon)>180)ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      pLon=lon;
     }
+  }
+  function traceLine(coords){
+    if(!coords.length)return;
+    ctx.moveTo(...project(coords[0][0],coords[0][1]));
+    let pLon=coords[0][0];
+    for(let i=1;i<coords.length;i++){
+      const[lon,lat]=coords[i],[x,y]=project(lon,lat);
+      if(Math.abs(lon-pLon)>180)ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      pLon=lon;
+    }
+  }
 
-    canvas.addEventListener('mousemove', e => {
-      const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-      const [lon, lat] = unproject(mx, my);
-      const ns = lat >= 0 ? 'N' : 'S', ew = lon >= 0 ? 'E' : 'W';
-      coordsEl.textContent = `${Math.abs(lat).toFixed(2)}°${ns}  ${Math.abs(lon).toFixed(2)}°${ew}`;
-      let found = null;
-      for (const city of cityDots) {
-        const dx = mx - city.x, dy = my - city.y;
-        if (Math.sqrt(dx*dx + dy*dy) < 14) { found = city; break; }
-      }
-      hoveredCity = found ? found.name : null;
-      cityLabelEl.textContent = hoveredCity ? '> ' + hoveredCity.toUpperCase() : '\u00a0';
-      canvas.style.cursor = hoveredCity ? 'crosshair' : 'default';
-      if (found) {
-        ttName.textContent = found.name.toUpperCase();
-        ttText.textContent = found.tooltip;
-        ttText.style.display = found.tooltip ? 'block' : 'none';
-        const headerH = mapHeader.offsetHeight;
-        let tx = found.x + 14, ty = headerH + found.y - 10;
-        if (tx + 230 > W) tx = found.x - 230;
-        tooltip.style.left = tx + 'px'; tooltip.style.top = ty + 'px'; tooltip.style.display = 'block';
-      } else { tooltip.style.display = 'none'; }
-    });
+  const world=await window.worldData;
+  const land=topojson.feature(world,world.objects.land);
+  const bordersMesh=topojson.mesh(world,world.objects.countries,(a,b)=>a!==b);
 
-    canvas.addEventListener('mouseleave', () => {
-      hoveredCity = null;
-      coordsEl.textContent = '\u00a0'; cityLabelEl.textContent = '\u00a0';
-      tooltip.style.display = 'none'; canvas.style.cursor = 'default';
-    });
+  function fillGeom(geom){
+    if(!geom)return;
+    if(geom.type==='Polygon'){ ctx.beginPath();traceRing(geom.coordinates[0]);ctx.fillStyle=LAND_FILL;ctx.fill(); }
+    else if(geom.type==='MultiPolygon') geom.coordinates.forEach(p=>{ ctx.beginPath();traceRing(p[0]);ctx.fillStyle=LAND_FILL;ctx.fill(); });
+    else if(geom.type==='Feature') fillGeom(geom.geometry);
+    else if(geom.type==='FeatureCollection') geom.features.forEach(f=>fillGeom(f.geometry));
+  }
 
-    draw();
-  } catch(e) {
-    const c = document.getElementById('map'), ctx = c.getContext('2d');
-    ctx.fillStyle = '#e8a000'; ctx.font = "16px 'VT323', monospace";
-    ctx.fillText('// map error: ' + e.message, 10, 30);
-    console.error('map error:', e);
-  }})();
-  </script>
+  const cityDots=CITIES.map(c=>{ const[x,y]=project(c.lon,c.lat); return{...c,x,y}; });
+  let hoveredCity=null, t=0;
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.save(); ctx.beginPath(); ctx.rect(0,0,W,H); ctx.clip();
+
+    ctx.beginPath();
+    for(let lon=-150;lon<180;lon+=30){
+      const[x0,y0]=project(lon,LAT_MAX),[,y1]=project(lon,LAT_MIN);
+      ctx.moveTo(x0,y0); ctx.lineTo(x0,y1);
+    }
+    ctx.strokeStyle=GRID; ctx.lineWidth=0.4; ctx.shadowBlur=0; ctx.stroke();
+
+    fillGeom(land);
+    ctx.beginPath(); tracePath(land);
+    ctx.strokeStyle=LAND_STROKE; ctx.lineWidth=0.6;
+    ctx.shadowColor=AMBER; ctx.shadowBlur=5; ctx.stroke(); ctx.shadowBlur=0;
+    ctx.beginPath(); tracePath(bordersMesh);
+    ctx.strokeStyle=BORDER; ctx.lineWidth=0.4; ctx.stroke();
+
+    t+=0.022;
+    for(const city of cityDots){
+      const isHover=hoveredCity===city.name;
+      const pulse=Math.sin(t+city.x*0.05)*0.5+0.5;
+      ctx.beginPath(); ctx.arc(city.x,city.y,5+pulse*6,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(255,183,0,${(0.12+pulse*0.18).toFixed(2)})`; ctx.lineWidth=0.8; ctx.shadowBlur=0; ctx.stroke();
+      ctx.beginPath(); ctx.arc(city.x,city.y,isHover?4.5:3,0,Math.PI*2);
+      ctx.fillStyle=AMBER_BRIGHT; ctx.shadowColor=AMBER_BRIGHT; ctx.shadowBlur=isHover?22:10; ctx.fill(); ctx.shadowBlur=0;
+    }
+    ctx.restore();
+    requestAnimationFrame(draw);
+  }
+
+  canvas.addEventListener('mousemove',e=>{
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    const[lon,lat]=unproject(mx,my);
+    const ns=lat>=0?'N':'S', ew=lon>=0?'E':'W';
+    coordsEl.textContent=`${Math.abs(lat).toFixed(2)}°${ns}  ${Math.abs(lon).toFixed(2)}°${ew}`;
+    let found=null;
+    for(const city of cityDots){ const dx=mx-city.x,dy=my-city.y; if(Math.sqrt(dx*dx+dy*dy)<14){found=city;break;} }
+    hoveredCity=found?found.name:null;
+    cityLabelEl.textContent=hoveredCity?'> '+hoveredCity.toUpperCase():'\u00a0';
+    canvas.style.cursor=hoveredCity?'crosshair':'default';
+    if(found){
+      ttName.textContent=found.name.toUpperCase(); ttText.textContent=found.tooltip;
+      ttText.style.display=found.tooltip?'block':'none';
+      const headerH=mapHeader.offsetHeight;
+      let tx=found.x+14, ty=headerH+found.y-10;
+      if(tx+230>W)tx=found.x-230;
+      tooltip.style.left=tx+'px'; tooltip.style.top=ty+'px'; tooltip.style.display='block';
+    } else tooltip.style.display='none';
+  });
+  canvas.addEventListener('mouseleave',()=>{
+    hoveredCity=null; coordsEl.textContent='\u00a0'; cityLabelEl.textContent='\u00a0';
+    tooltip.style.display='none'; canvas.style.cursor='default';
+  });
+  draw();
+} catch(e){
+  const c=document.getElementById('map'),ctx=c.getContext('2d');
+  ctx.fillStyle='#e8a000'; ctx.font="16px 'VT323',monospace";
+  ctx.fillText('// map error: '+e.message,10,30); console.error(e);
+}})();
+</script>
 </body>
 </html>
