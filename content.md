@@ -2,6 +2,8 @@
 
 software developer. based in switzerland.
 
+*i build therefore i am.*
+
 ---
 
 **what i'm up to**
