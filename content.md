@@ -1,4 +1,4 @@
-# Marco Cermusoni <span class="handle">@kremen</span>
+# Marco Cermusoni
 
 ---
 
@@ -10,8 +10,6 @@
 <span class="tag" data-tag="Health" style="--tag-color:#f87171">Health</span>
 <span class="tag" data-tag="Product" style="--tag-color:#60a5fa">Product</span>
 </p>
-
-## work
 
 <div class="project-grid">
 
