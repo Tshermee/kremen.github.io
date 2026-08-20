@@ -90,12 +90,19 @@
       background:var(--tag-color,var(--amber)); box-shadow:0 0 4px var(--tag-color,var(--amber));
     }
     .tag-legend {
-      display:flex; flex-wrap:wrap; gap:0.5em 1.4em; margin:0 0 1em;
+      display:flex; flex-wrap:wrap; gap:0.6em 0.8em; margin:0 0 1em;
       font-family:'Inter',sans-serif; font-size:0.5em; letter-spacing:0.04em;
     }
-    .tag-legend .tag { cursor:pointer; transition:opacity 0.15s; }
-    .tag-legend .tag:hover { opacity:1; }
-    .tag-legend .tag.active { opacity:1; }
+    .tag-legend .tag {
+      cursor:pointer; opacity:0.55; padding:0.3em 0.65em;
+      border:1px solid transparent; border-radius:3px;
+      transition:opacity 0.15s,border-color 0.15s,background-color 0.15s;
+    }
+    .tag-legend .tag:hover { opacity:0.85; }
+    .tag-legend .tag.active {
+      opacity:1; border-color:var(--tag-color);
+      background-color:color-mix(in srgb, var(--tag-color) 15%, transparent);
+    }
     #content li .tag { margin-left:0.6em; font-size:0.85em; opacity:0.7; }
     #content li.tag-dim { opacity:0.22; }
 
@@ -204,11 +211,11 @@
     op:Math.random()*0.22+0.05,
     sz:Math.floor(Math.random()*3)+10,
   }));
-  const SAT_COLORS=['228,237,230','255,59,48','228,237,230'];
-  const sats=Array.from({length:9},()=>({
+  const SAT_COLORS=['125,211,252','192,132,252','251,191,36','251,146,60','248,113,113','96,165,250'];
+  const sats=Array.from({length:11},()=>({
     x:Math.random(), y:Math.random(),
     vx:(Math.random()-0.5)*0.00006, vy:(Math.random()-0.5)*0.00006,
-    op:Math.random()*0.25+0.25,
+    op:Math.random()*0.35+0.4,
     sz:Math.floor(Math.random()*5)+14,
     color:SAT_COLORS[Math.floor(Math.random()*SAT_COLORS.length)],
   }));
@@ -225,7 +232,7 @@
       s.x=(s.x+s.vx+1)%1; s.y=(s.y+s.vy+1)%1;
       ctx.font=`${s.sz}px VT323,monospace`;
       ctx.fillStyle=`rgba(${s.color},${s.op})`;
-      ctx.shadowColor=`rgba(${s.color},0.6)`; ctx.shadowBlur=3;
+      ctx.shadowColor=`rgba(${s.color},0.9)`; ctx.shadowBlur=6;
       ctx.fillText('◇',s.x*W,s.y*H);
       ctx.shadowBlur=0;
     }

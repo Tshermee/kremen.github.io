@@ -110,12 +110,3 @@
 </article>
 
 </div>
-
----
-
-## things i like
-- cyberpunky stuff / gibson novels
-- (jail)breaking things
-- public blue screens
-
----
