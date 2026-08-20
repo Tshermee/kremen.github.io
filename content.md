@@ -7,6 +7,7 @@
 <span class="tag" data-tag="Product" style="--tag-color:#60a5fa">Product</span>
 <span class="tag" data-tag="AI" style="--tag-color:#7dd3fc">AI</span>
 <span class="tag" data-tag="Spatial tech" style="--tag-color:#c084fc">Spatial tech</span>
+<span class="tag" data-tag="Community" style="--tag-color:#fb923c">Community</span>
 </p>
 
 <div class="project-grid">
@@ -30,6 +31,7 @@
 <p>Organizing <a href="https://uphillconf.com/">Uphill Conf</a> — a highly applied AI conference in Bern.</p>
 <div class="project-tags">
 <span class="tag" data-tag="AI" style="--tag-color:#7dd3fc">AI</span>
+<span class="tag" data-tag="Community" style="--tag-color:#fb923c">Community</span>
 </div>
 </div>
 </article>
@@ -65,6 +67,7 @@
 <div class="project-tags">
 <span class="tag" data-tag="Spatial tech" style="--tag-color:#c084fc">Spatial tech</span>
 <span class="tag" data-tag="Product" style="--tag-color:#60a5fa">Product</span>
+<span class="tag" data-tag="Community" style="--tag-color:#fb923c">Community</span>
 </div>
 </div>
 </article>
