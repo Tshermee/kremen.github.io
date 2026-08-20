@@ -6,9 +6,8 @@
   <title>kremen</title>
   <link rel="icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@300;400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@300;400&family=Orbitron:wght@700;900&display=swap">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -60,8 +59,19 @@
 
     #content { position:relative; z-index:1; }
     #content * { text-shadow:0 0 7px var(--amber-glow),0 0 2px rgba(57,255,106,0.4); }
-    #content h1,#content h2,#content h3,#content strong { font-family:'VT323',monospace; }
-    #content h1 { font-size:2.4em; letter-spacing:0.04em; margin-bottom:0.3em; text-shadow:0 0 14px var(--amber-glow),0 0 4px rgba(57,255,106,0.5); }
+    #content h2,#content h3,#content strong { font-family:'VT323',monospace; }
+    #content h1 {
+      display:flex; align-items:baseline; flex-wrap:wrap; gap:0.5em;
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:1.9em;
+      letter-spacing:0.02em; margin-bottom:0.3em;
+      text-shadow:0 0 14px var(--amber-glow),0 0 4px rgba(57,255,106,0.5);
+    }
+    #content h1 .handle {
+      font-family:'VT323',monospace; font-weight:400; font-size:0.4em;
+      color:var(--red); letter-spacing:0.08em; padding:0.15em 0.5em;
+      border:1px solid var(--red); border-radius:2px;
+      text-shadow:0 0 6px var(--red-glow);
+    }
     #content h2 {
       display:inline-block; font-size:0.85em; margin:1.9em 0 0.7em; padding:0.2em 0.75em;
       color:var(--amber-bright); letter-spacing:0.16em; text-transform:uppercase;
@@ -95,6 +105,40 @@
     .tag-legend .tag.active { opacity:1; }
     #content li .tag { margin-left:0.6em; font-size:0.85em; opacity:0.7; }
     #content li.tag-dim { opacity:0.22; }
+
+    .project-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:2.4rem 1.8rem; margin:0 0 1.4em;
+    }
+    .project { transition:opacity 0.25s; }
+    .project.tag-dim { opacity:0.22; }
+    .project-media {
+      position:relative; aspect-ratio:4/3; margin-bottom:0.9rem;
+      border:1px solid var(--amber-dim); overflow:hidden;
+      background:
+        repeating-linear-gradient(45deg,rgba(57,255,106,0.05) 0 2px,transparent 2px 14px),
+        radial-gradient(ellipse at center,rgba(57,255,106,0.06),transparent 70%);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .project-media::before,.project-media::after {
+      content:''; position:absolute; width:0.7em; height:0.7em;
+      border:1px solid var(--red); opacity:0.7;
+    }
+    .project-media::before { top:0.5em; left:0.5em; border-width:1px 0 0 1px; }
+    .project-media::after  { bottom:0.5em; right:0.5em; border-width:0 1px 1px 0; }
+    .project-media span {
+      font-family:'VT323',monospace; font-size:0.75em; letter-spacing:0.2em;
+      opacity:0.4; text-shadow:0 0 6px var(--amber-glow);
+    }
+    .project-body h3 {
+      font-family:'VT323',monospace; font-size:1.05em; letter-spacing:0.03em;
+      color:var(--amber-bright); margin-bottom:0.3em;
+    }
+    .project-body p {
+      font-family:'Inter',sans-serif; font-size:0.56em; line-height:1.65;
+      opacity:0.85; margin-bottom:0.6em;
+    }
+    .project-tags { display:flex; flex-wrap:wrap; gap:0.4em 1em; font-size:0.5em; }
     #content strong { color:var(--amber-bright); }
     #content em { opacity:0.75; font-style:normal; }
     #content code { font-family:'VT323',monospace; background:rgba(57,255,106,0.07); border:1px solid var(--amber-dim); padding:0 0.35em; }
@@ -102,20 +146,6 @@
     #content pre code { background:none; border:none; padding:0; }
     #content blockquote { border-left:2px solid var(--amber-dim); padding-left:1em; opacity:0.7; }
     #content:empty::after { content:'_'; animation:cursor 1s step-end infinite; text-shadow:0 0 7px var(--amber-glow); }
-
-    #map-wrap { position:relative; z-index:1; margin-top:1rem; border-top:1px solid rgba(14,92,38,0.4); padding-top:1.2rem; }
-    #map-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.5rem; font-size:0.78em; letter-spacing:0.18em; opacity:0.6; text-shadow:0 0 6px var(--amber-glow); }
-    #map-coords { opacity:1; letter-spacing:0.1em; }
-    #map { width:100%; display:block; border:1px solid rgba(14,92,38,0.3); }
-    #map-footer { display:flex; justify-content:space-between; margin-top:0.4rem; font-size:0.72em; opacity:0.45; letter-spacing:0.12em; }
-    #map-tooltip {
-      position:absolute; display:none; pointer-events:none; z-index:20;
-      background:#030a04; border:1px solid var(--amber-dim);
-      padding:0.5em 0.8em; max-width:220px; line-height:1.4;
-      box-shadow:0 0 12px rgba(57,255,106,0.2),inset 0 0 20px rgba(0,0,0,0.4);
-    }
-    #map-tooltip .tt-name { color:var(--amber-bright); font-size:0.9em; letter-spacing:0.12em; text-shadow:0 0 8px var(--amber-glow); display:block; margin-bottom:0.15em; }
-    #map-tooltip .tt-text { color:var(--amber); font-size:0.78em; opacity:0.85; }
   </style>
 </head>
 <body>
@@ -124,40 +154,16 @@
 
   <div class="screen">
     <div id="content"></div>
-    <div id="map-wrap">
-      <div id="map-header">
-        <span id="map-coords">&nbsp;</span>
-      </div>
-      <canvas id="map"></canvas>
-      <div id="map-tooltip"><span class="tt-name"></span><span class="tt-text"></span></div>
-      <div id="map-footer">
-        <span id="map-city-label">&nbsp;</span>
-        <span>ZOOM 1.00</span>
-      </div>
-    </div>
   </div>
 
 <script>
-// ── shared data ────────────────────────────────────
-const CITIES = [
-  { name:'Vancouver',   lat:49.28,   lon:-123.12, tooltip:'' },
-  { name:'Bern',        lat:46.95,   lon:  7.45,  tooltip:'' },
-  { name:'Singapore',   lat: 1.35,   lon:103.82,  tooltip:'' },
-  { name:'Cannes',      lat:43.55,   lon:  7.02,  tooltip:'' },
-  { name:'Tokyo',       lat:35.68,   lon:139.65,  tooltip:'' },
-  { name:'Yosemite',    lat:37.865,  lon:-119.54, tooltip:'' },
-  { name:'Los Angeles', lat:34.052,  lon:-118.24, tooltip:'' },
-];
-
-window.worldData = fetch('countries-110m.json').then(r => r.json());
-
 // ── boot sequence ──────────────────────────────────
 (function(){
   const overlay = document.getElementById('boot-overlay');
   const out     = document.getElementById('boot-text');
   const COOLDOWN = 60 * 60 * 1000; // 1 hour
   const last = parseInt(localStorage.getItem('kremen_boot')||'0',10);
-  if(Date.now()-last < COOLDOWN){ overlay.style.display='none'; startGlitch(); return; }
+  if(Date.now()-last < COOLDOWN){ overlay.style.display='none'; /* startGlitch(); */ return; }
   localStorage.setItem('kremen_boot', Date.now());
   const lines = [
     '[    0.000000] Linux version 6.6.0-kremen #1 SMP PREEMPT_DYNAMIC',
@@ -181,7 +187,7 @@ window.worldData = fetch('countries-110m.json').then(r => r.json());
   let li=0, ci=0, text='';
   function tick(){
     if(li>=lines.length){
-      setTimeout(()=>{ overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; startGlitch(); },800); },400);
+      setTimeout(()=>{ overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; /* startGlitch(); */ },800); },400);
       return;
     }
     const line=lines[li];
@@ -328,12 +334,12 @@ fetch('content.md')
 // ── tag filter ─────────────────────────────────────
 function initTagFilter(){
   const legendTags=[...document.querySelectorAll('.tag-legend .tag')];
-  const items=[...document.querySelectorAll('#content li')];
+  const items=[...document.querySelectorAll('#content .project')];
   let active=null;
   function apply(){
-    for(const li of items){
-      const has=!!active && !!li.querySelector(`.tag[data-tag="${active}"]`);
-      li.classList.toggle('tag-dim', !!active && !has);
+    for(const el of items){
+      const has=!!active && !!el.querySelector(`.tag[data-tag="${active}"]`);
+      el.classList.toggle('tag-dim', !!active && !has);
     }
     for(const t of legendTags) t.classList.toggle('active', t.dataset.tag===active);
   }
@@ -341,141 +347,6 @@ function initTagFilter(){
     t.addEventListener('click',()=>{ active = active===t.dataset.tag ? null : t.dataset.tag; apply(); });
   }
 }
-
-// ── map ────────────────────────────────────────────
-(async function(){ try{
-  const canvas=document.getElementById('map');
-  const ctx=canvas.getContext('2d');
-  const wrap=document.getElementById('map-wrap');
-  const coordsEl=document.getElementById('map-coords');
-  const cityLabelEl=document.getElementById('map-city-label');
-  const tooltip=document.getElementById('map-tooltip');
-  const ttName=tooltip.querySelector('.tt-name');
-  const ttText=tooltip.querySelector('.tt-text');
-  const mapHeader=document.getElementById('map-header');
-
-  const W=wrap.clientWidth, H=Math.round(W*0.54);
-  const DPR=window.devicePixelRatio||1;
-  canvas.width=W*DPR; canvas.height=H*DPR;
-  canvas.style.width=W+'px'; canvas.style.height=H+'px';
-  ctx.scale(DPR,DPR);
-
-  const AMBER='#39ff6a', AMBER_BRIGHT='#9dffb8';
-  const LAND_FILL='rgba(57,255,106,0.09)', LAND_STROKE='rgba(57,255,106,0.6)';
-  const BORDER='rgba(57,255,106,0.2)', GRID='rgba(57,255,106,0.1)';
-
-  const LON_MIN=-165,LON_MAX=170,LAT_MAX=76,LAT_MIN=-57;
-  const LON_SPAN=LON_MAX-LON_MIN, LAT_SPAN=LAT_MAX-LAT_MIN;
-  function project(lon,lat){ return [(lon-LON_MIN)/LON_SPAN*W,(LAT_MAX-lat)/LAT_SPAN*H]; }
-  function unproject(x,y){ return [x/W*LON_SPAN+LON_MIN, LAT_MAX-y/H*LAT_SPAN]; }
-
-  function tracePath(geom){
-    if(!geom)return;
-    if(geom.type==='Polygon') geom.coordinates.forEach(traceRing);
-    else if(geom.type==='MultiPolygon') geom.coordinates.forEach(p=>p.forEach(traceRing));
-    else if(geom.type==='LineString') traceLine(geom.coordinates);
-    else if(geom.type==='MultiLineString') geom.coordinates.forEach(traceLine);
-    else if(geom.type==='GeometryCollection') geom.geometries.forEach(tracePath);
-    else if(geom.type==='Feature') tracePath(geom.geometry);
-    else if(geom.type==='FeatureCollection') geom.features.forEach(tracePath);
-  }
-  function traceRing(coords){
-    if(!coords.length)return;
-    ctx.moveTo(...project(coords[0][0],coords[0][1]));
-    let pLon=coords[0][0];
-    for(let i=1;i<coords.length;i++){
-      const[lon,lat]=coords[i],[x,y]=project(lon,lat);
-      if(Math.abs(lon-pLon)>180)ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      pLon=lon;
-    }
-  }
-  function traceLine(coords){
-    if(!coords.length)return;
-    ctx.moveTo(...project(coords[0][0],coords[0][1]));
-    let pLon=coords[0][0];
-    for(let i=1;i<coords.length;i++){
-      const[lon,lat]=coords[i],[x,y]=project(lon,lat);
-      if(Math.abs(lon-pLon)>180)ctx.moveTo(x,y); else ctx.lineTo(x,y);
-      pLon=lon;
-    }
-  }
-
-  const world=await window.worldData;
-  const land=topojson.feature(world,world.objects.land);
-  const bordersMesh=topojson.mesh(world,world.objects.countries,(a,b)=>a!==b);
-
-  function fillGeom(geom){
-    if(!geom)return;
-    if(geom.type==='Polygon'){ ctx.beginPath();traceRing(geom.coordinates[0]);ctx.fillStyle=LAND_FILL;ctx.fill(); }
-    else if(geom.type==='MultiPolygon') geom.coordinates.forEach(p=>{ ctx.beginPath();traceRing(p[0]);ctx.fillStyle=LAND_FILL;ctx.fill(); });
-    else if(geom.type==='Feature') fillGeom(geom.geometry);
-    else if(geom.type==='FeatureCollection') geom.features.forEach(f=>fillGeom(f.geometry));
-  }
-
-  const cityDots=CITIES.map(c=>{ const[x,y]=project(c.lon,c.lat); return{...c,x,y}; });
-  let hoveredCity=null, t=0;
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    ctx.save(); ctx.beginPath(); ctx.rect(0,0,W,H); ctx.clip();
-
-    ctx.beginPath();
-    for(let lon=-150;lon<180;lon+=30){
-      const[x0,y0]=project(lon,LAT_MAX),[,y1]=project(lon,LAT_MIN);
-      ctx.moveTo(x0,y0); ctx.lineTo(x0,y1);
-    }
-    ctx.strokeStyle=GRID; ctx.lineWidth=0.4; ctx.shadowBlur=0; ctx.stroke();
-
-    fillGeom(land);
-    ctx.beginPath(); tracePath(land);
-    ctx.strokeStyle=LAND_STROKE; ctx.lineWidth=0.6;
-    ctx.shadowColor=AMBER; ctx.shadowBlur=5; ctx.stroke(); ctx.shadowBlur=0;
-    ctx.beginPath(); tracePath(bordersMesh);
-    ctx.strokeStyle=BORDER; ctx.lineWidth=0.4; ctx.stroke();
-
-    t+=0.022;
-    for(const city of cityDots){
-      const isHover=hoveredCity===city.name;
-      const pulse=Math.sin(t+city.x*0.05)*0.5+0.5;
-      ctx.beginPath(); ctx.arc(city.x,city.y,5+pulse*6,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(157,255,184,${(0.12+pulse*0.18).toFixed(2)})`; ctx.lineWidth=0.8; ctx.shadowBlur=0; ctx.stroke();
-      ctx.beginPath(); ctx.arc(city.x,city.y,isHover?4.5:3,0,Math.PI*2);
-      ctx.fillStyle=AMBER_BRIGHT; ctx.shadowColor=AMBER_BRIGHT; ctx.shadowBlur=isHover?22:10; ctx.fill(); ctx.shadowBlur=0;
-    }
-    ctx.restore();
-    requestAnimationFrame(draw);
-  }
-
-  canvas.addEventListener('mousemove',e=>{
-    const rect=canvas.getBoundingClientRect();
-    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
-    const[lon,lat]=unproject(mx,my);
-    const ns=lat>=0?'N':'S', ew=lon>=0?'E':'W';
-    coordsEl.textContent=`${Math.abs(lat).toFixed(2)}°${ns}  ${Math.abs(lon).toFixed(2)}°${ew}`;
-    let found=null;
-    for(const city of cityDots){ const dx=mx-city.x,dy=my-city.y; if(Math.sqrt(dx*dx+dy*dy)<14){found=city;break;} }
-    hoveredCity=found?found.name:null;
-    cityLabelEl.textContent=hoveredCity?'> '+hoveredCity.toUpperCase():'\u00a0';
-    canvas.style.cursor=hoveredCity?'crosshair':'default';
-    if(found){
-      ttName.textContent=found.name.toUpperCase(); ttText.textContent=found.tooltip;
-      ttText.style.display=found.tooltip?'block':'none';
-      const headerH=mapHeader.offsetHeight;
-      let tx=found.x+14, ty=headerH+found.y-10;
-      if(tx+230>W)tx=found.x-230;
-      tooltip.style.left=tx+'px'; tooltip.style.top=ty+'px'; tooltip.style.display='block';
-    } else tooltip.style.display='none';
-  });
-  canvas.addEventListener('mouseleave',()=>{
-    hoveredCity=null; coordsEl.textContent='\u00a0'; cityLabelEl.textContent='\u00a0';
-    tooltip.style.display='none'; canvas.style.cursor='default';
-  });
-  draw();
-} catch(e){
-  const c=document.getElementById('map'),ctx=c.getContext('2d');
-  ctx.fillStyle='#39ff6a'; ctx.font="16px 'VT323',monospace";
-  ctx.fillText('// map error: '+e.message,10,30); console.error(e);
-}})();
 </script>
 </body>
 </html>
