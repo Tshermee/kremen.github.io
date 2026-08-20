@@ -159,10 +159,12 @@
 // ── boot sequence ──────────────────────────────────
 (function(){
   const overlay = document.getElementById('boot-overlay');
+  overlay.style.display='none';
+  /* startup animation disabled — remove the two lines above to restore it
   const out     = document.getElementById('boot-text');
   const COOLDOWN = 60 * 60 * 1000; // 1 hour
   const last = parseInt(localStorage.getItem('kremen_boot')||'0',10);
-  if(Date.now()-last < COOLDOWN){ overlay.style.display='none'; /* startGlitch(); */ return; }
+  if(Date.now()-last < COOLDOWN){ overlay.style.display='none'; return; }
   localStorage.setItem('kremen_boot', Date.now());
   const lines = [
     '[    0.000000] Linux version 6.6.0-kremen #1 SMP PREEMPT_DYNAMIC',
@@ -186,7 +188,7 @@
   let li=0, ci=0, text='';
   function tick(){
     if(li>=lines.length){
-      setTimeout(()=>{ overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; /* startGlitch(); */ },800); },400);
+      setTimeout(()=>{ overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; },800); },400);
       return;
     }
     const line=lines[li];
@@ -194,6 +196,7 @@
     else{ text+='\n'; out.textContent=text+'█'; li++;ci=0; setTimeout(tick,li<16?30:220); }
   }
   tick();
+  */
 })();
 
 // ── starfield ──────────────────────────────────────
@@ -334,16 +337,20 @@ fetch('content.md')
 function initTagFilter(){
   const legendTags=[...document.querySelectorAll('.tag-legend .tag')];
   const items=[...document.querySelectorAll('#content .project')];
-  let active=null;
+  const active=new Set();
   function apply(){
     for(const el of items){
-      const has=!!active && !!el.querySelector(`.tag[data-tag="${active}"]`);
-      el.classList.toggle('tag-dim', !!active && !has);
+      const has = active.size===0 || [...active].some(tag=>el.querySelector(`.tag[data-tag="${tag}"]`));
+      el.classList.toggle('tag-dim', !has);
     }
-    for(const t of legendTags) t.classList.toggle('active', t.dataset.tag===active);
+    for(const t of legendTags) t.classList.toggle('active', active.has(t.dataset.tag));
   }
   for(const t of legendTags){
-    t.addEventListener('click',()=>{ active = active===t.dataset.tag ? null : t.dataset.tag; apply(); });
+    t.addEventListener('click',()=>{
+      const tag=t.dataset.tag;
+      if(active.has(tag)) active.delete(tag); else active.add(tag);
+      apply();
+    });
   }
 }
 </script>
