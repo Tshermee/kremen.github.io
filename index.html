@@ -2,357 +2,152 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>kremen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marco Cermusoni</title>
+  <meta name="description" content="Marco Cermusoni: 3D worlds, AI experiments, spatial systems, community, and other things he probably shouldn’t have started.">
+  <meta name="theme-color" content="#F2F0E9">
   <link rel="icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@300;400&family=Archivo+Black&display=swap">
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --amber: #e4ede6;
-      --amber-bright: #ffffff;
-      --amber-dim: #3a423d;
-      --bg: #08090a;
-      --red: #ff3b30;
-      --red-dim: #5c221d;
-      --red-glow: rgba(255,59,48,0.3);
-    }
-
-    @keyframes flicker {
-      0%,18%,22%,25%,53%,57%,100% { opacity: 1; }
-      20%,24%,55% { opacity: 0.965; }
-    }
-    @keyframes cursor { 0%,100%{opacity:1} 50%{opacity:0} }
-
-    html,body { min-height:100vh; background:var(--bg); }
-
-    body {
-      position:relative; display:flex; justify-content:center;
-      padding:4rem 1.5rem 6rem;
-      font-family:'VT323',monospace; font-size:28px; line-height:1.75;
-      color:var(--amber); animation:flicker 14s infinite;
-    }
-    body::before {
-      content:''; position:fixed; inset:0; pointer-events:none; z-index:10;
-      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.10) 2px,rgba(0,0,0,0.10) 4px);
-    }
-    body::after {
-      content:''; position:fixed; inset:0; pointer-events:none; z-index:11;
-      background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.6) 100%);
-    }
-
-    #starfield { position:fixed; inset:0; z-index:0; pointer-events:none; }
-
-    #boot-overlay {
-      position:fixed; inset:0; z-index:100; background:var(--bg);
-      padding:3rem 3.5rem; pointer-events:none;
-      font-family:'VT323',monospace; font-size:22px; color:var(--amber);
-      transition:opacity 0.8s;
-    }
-    #boot-text { white-space:pre-wrap; line-height:1.6; }
-
-    .screen { position:relative; max-width:950px; width:100%; padding:3rem 2.5rem; }
-
-    #content { position:relative; z-index:12; }
-    #content h2,#content strong { font-family:'VT323',monospace; }
-    #content h1 {
-      display:inline-block;
-      font-family:'Archivo Black',sans-serif; font-weight:400; font-size:1.7em;
-      text-transform:uppercase; letter-spacing:0; margin-bottom:0.3em;
-      background:var(--amber-bright); color:var(--bg); padding:0.15em 0.45em;
-    }
-    #content h2 {
-      display:inline-block; font-size:0.85em; margin:1.9em 0 0.7em; padding:0.2em 0.75em;
-      color:var(--amber-bright); letter-spacing:0.16em; text-transform:uppercase;
-      border:1px solid var(--red);
-      box-shadow:0 0 5px var(--red-glow), inset 0 0 6px rgba(255,59,48,0.06);
-    }
-    #content h3 { font-size:1.2em; margin:1.2em 0 0.3em; }
-    #content p  { margin-bottom:0.9em; opacity:0.9; font-family:'Inter',sans-serif; font-size:0.56em; line-height:1.7; letter-spacing:0; }
-    #content a  { color:var(--amber-bright); text-decoration:none; border-bottom:1px solid var(--amber-dim); transition:border-color 0.1s; }
-    #content a:hover { border-bottom-color:var(--amber-bright); }
-    #content ul,#content ol { margin:0 0 0.9em 1.4em; }
-    #content li { margin-bottom:0.4em; font-family:'Inter',sans-serif; font-size:0.56em; line-height:1.7; letter-spacing:0; transition:opacity 0.25s; }
-    #content hr { border:none; border-top:1px solid var(--amber-dim); margin:1.6em 0; opacity:0.45; }
-
-    .tag {
-      display:inline-flex; align-items:center; gap:0.45em; user-select:none;
-      text-transform:uppercase; letter-spacing:0.1em; opacity:0.85;
-      color:var(--tag-color,var(--amber-bright));
-    }
-    .tag::before {
-      content:''; flex:none; width:0.55em; height:0.55em; border-radius:50%;
-      background:var(--tag-color,var(--amber)); box-shadow:0 0 4px var(--tag-color,var(--amber));
-    }
-    .tag-legend {
-      display:flex; flex-wrap:wrap; gap:0.6em 0.8em; margin:0 0 1em;
-      font-family:'Inter',sans-serif; font-size:0.5em; letter-spacing:0.04em;
-    }
-    .tag-legend .tag {
-      cursor:pointer; opacity:0.55; padding:0.3em 0.65em;
-      border:1px solid transparent; border-radius:3px;
-      transition:opacity 0.15s,border-color 0.15s,background-color 0.15s;
-    }
-    .tag-legend .tag:hover { opacity:0.85; }
-    .tag-legend .tag.active {
-      opacity:1; border-color:var(--tag-color);
-      background-color:color-mix(in srgb, var(--tag-color) 15%, transparent);
-    }
-    #content li .tag { margin-left:0.6em; font-size:0.85em; opacity:0.7; }
-    #content li.tag-dim { opacity:0.22; }
-
-    .project-grid {
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-      gap:2.4rem 1.8rem; margin:0 0 1.4em;
-    }
-    .project { transition:opacity 0.25s; }
-    .project.tag-dim { opacity:0.22; }
-    .project-media {
-      position:relative; aspect-ratio:4/3; margin-bottom:0.9rem;
-      border:1px solid var(--amber-dim); overflow:hidden;
-      background:
-        repeating-linear-gradient(45deg,rgba(228,237,230,0.04) 0 2px,transparent 2px 14px),
-        radial-gradient(ellipse at center,rgba(228,237,230,0.04),transparent 70%);
-      display:flex; align-items:center; justify-content:center;
-    }
-    .project-media::before,.project-media::after {
-      content:''; position:absolute; width:0.7em; height:0.7em;
-      border:1px solid var(--red); opacity:0.7;
-    }
-    .project-media::before { top:0.5em; left:0.5em; border-width:1px 0 0 1px; }
-    .project-media::after  { bottom:0.5em; right:0.5em; border-width:0 1px 1px 0; }
-    .project-media span {
-      font-family:'VT323',monospace; font-size:0.75em; letter-spacing:0.2em;
-      opacity:0.4;
-    }
-    .project-body h3 {
-      font-family:'Archivo Black',sans-serif; font-weight:400; font-size:0.8em;
-      text-transform:uppercase; letter-spacing:0;
-      color:var(--amber-bright); margin-bottom:0.3em;
-    }
-    .project-body p {
-      font-family:'Inter',sans-serif; font-size:0.56em; line-height:1.65;
-      opacity:0.85; margin-bottom:0.6em;
-    }
-    .project-tags { display:flex; flex-wrap:wrap; gap:0.4em 1em; font-size:0.5em; }
-    #content strong { color:var(--amber-bright); }
-    #content em { opacity:0.75; font-style:normal; }
-    #content code { font-family:'VT323',monospace; background:rgba(228,237,230,0.06); border:1px solid var(--amber-dim); padding:0 0.35em; }
-    #content pre  { background:rgba(228,237,230,0.04); border:1px solid var(--amber-dim); padding:1em 1.2em; margin-bottom:1em; overflow-x:auto; }
-    #content pre code { background:none; border:none; padding:0; }
-    #content blockquote { border-left:2px solid var(--amber-dim); padding-left:1em; opacity:0.7; }
-    #content:empty::after { content:'_'; animation:cursor 1s step-end infinite; }
-  </style>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&family=Nanum+Pen+Script&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js" } }
+  </script>
+  <link rel="modulepreload" href="js/main.js">
+  <script type="module" src="js/main.js"></script>
 </head>
 <body>
-  <canvas id="starfield"></canvas>
-  <div id="boot-overlay"><pre id="boot-text"></pre></div>
+  <a class="skip mono" href="#work">Skip to work</a>
 
-  <div class="screen">
-    <div id="content"></div>
-  </div>
+  <!-- RGB channel separation used on project hover -->
+  <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <filter id="rgb-split" x="-2%" y="0" width="104%" height="100%" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>
+      <feOffset in="r" dx="-3" result="r2"/>
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>
+      <feOffset in="b" dx="3" result="b2"/>
+      <feBlend in="r2" in2="g" mode="screen" result="rg"/>
+      <feBlend in="rg" in2="b2" mode="screen"/>
+    </filter>
+  </svg>
 
-<script>
-// ── boot sequence ──────────────────────────────────
-(function(){
-  const overlay = document.getElementById('boot-overlay');
-  overlay.style.display='none';
-  /* startup animation disabled — remove the two lines above to restore it
-  const out     = document.getElementById('boot-text');
-  const COOLDOWN = 60 * 60 * 1000; // 1 hour
-  const last = parseInt(localStorage.getItem('kremen_boot')||'0',10);
-  if(Date.now()-last < COOLDOWN){ overlay.style.display='none'; return; }
-  localStorage.setItem('kremen_boot', Date.now());
-  const lines = [
-    '[    0.000000] Linux version 6.6.0-kremen #1 SMP PREEMPT_DYNAMIC',
-    '[    0.000001] Command line: BOOT_IMAGE=/vmlinuz root=/dev/nvme0n1p2 quiet',
-    '[    0.041337] ACPI: IRQ0 used by override.',
-    '[    0.312000] PCI: Using configuration type 1 for base access',
-    '[    0.420000] Initializing cgroup subsys cpuset ... done',
-    '[    0.694200] Loading /proc/self/ego ... ENOENT (expected)',
-    '[    1.000000] systemd[1]: Reached target Basic System.',
-    '[    1.001000] Started D-Bus System Message Bus.',
-    '[    1.337000] mate.service: refill #4 initiated',
-    '[    1.338000] mate.service: ENOYERBA — continuing on willpower',
-    '[    1.339000] imposter-syndrome.service: active (running) since boot',
-    '[    1.802000] identity-manager.service: 19 profiles loaded — arbitrating persona',
-    '[    2.001000] ssh: no host key found, generating new identity',
-    '[    2.100000] Reached target Multi-User System.',
-    '[    2.101000] Started kremen.io.',
-    '',
-    'kremen login: _',
-  ];
-  let li=0, ci=0, text='';
-  function tick(){
-    if(li>=lines.length){
-      setTimeout(()=>{ overlay.style.opacity='0'; setTimeout(()=>{ overlay.style.display='none'; },800); },400);
-      return;
-    }
-    const line=lines[li];
-    if(ci<line.length){ text+=line[ci++]; out.textContent=text+'█'; setTimeout(tick,4+Math.random()*4); }
-    else{ text+='\n'; out.textContent=text+'█'; li++;ci=0; setTimeout(tick,li<16?30:220); }
-  }
-  tick();
-  */
-})();
+  <header class="site-nav">
+    <a class="brand" href="#top">Marco Cermusoni</a>
+    <nav aria-label="Sections">
+      <ul>
+        <li><a class="mono" href="#work" data-section="work">Work</a></li>
+        <li><a class="mono" href="#lab" data-section="lab">Lab</a></li>
+        <li><a class="mono" href="#input" data-section="input">Input</a></li>
+        <li><a class="mono" href="#about" data-section="about">About</a></li>
+      </ul>
+    </nav>
+  </header>
 
-// ── starfield ──────────────────────────────────────
-(function(){
-  const canvas=document.getElementById('starfield');
-  const ctx=canvas.getContext('2d');
-  const resize=()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; };
-  resize(); window.addEventListener('resize',resize);
-  const CHARS=['.','·','+','·','.'];
-  const stars=Array.from({length:65},()=>({
-    x:Math.random(), y:Math.random(),
-    vx:(Math.random()-0.5)*0.00012, vy:(Math.random()-0.5)*0.00012,
-    ch:CHARS[Math.floor(Math.random()*CHARS.length)],
-    op:Math.random()*0.22+0.05,
-    sz:Math.floor(Math.random()*3)+10,
-  }));
-  const SAT_COLORS=['125,211,252','192,132,252','251,191,36','251,146,60','248,113,113','96,165,250'];
-  const sats=Array.from({length:11},()=>({
-    x:Math.random(), y:Math.random(),
-    vx:(Math.random()-0.5)*0.00006, vy:(Math.random()-0.5)*0.00006,
-    op:Math.random()*0.35+0.4,
-    sz:Math.floor(Math.random()*5)+14,
-    color:SAT_COLORS[Math.floor(Math.random()*SAT_COLORS.length)],
-  }));
-  function draw(){
-    const W=canvas.width,H=canvas.height;
-    ctx.clearRect(0,0,W,H);
-    for(const s of stars){
-      s.x=(s.x+s.vx+1)%1; s.y=(s.y+s.vy+1)%1;
-      ctx.fillStyle=`rgba(228,237,230,${s.op})`;
-      ctx.font=`${s.sz}px VT323,monospace`;
-      ctx.fillText(s.ch,s.x*W,s.y*H);
-    }
-    for(const s of sats){
-      s.x=(s.x+s.vx+1)%1; s.y=(s.y+s.vy+1)%1;
-      ctx.font=`${s.sz}px VT323,monospace`;
-      ctx.fillStyle=`rgba(${s.color},${s.op})`;
-      ctx.shadowColor=`rgba(${s.color},0.9)`; ctx.shadowBlur=6;
-      ctx.fillText('◇',s.x*W,s.y*H);
-      ctx.shadowBlur=0;
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
+  <main id="top">
+    <!-- ───────────── HERO ───────────── -->
+    <section class="hero" aria-labelledby="hero-name">
+      <canvas class="hero-canvas" role="img" aria-label="An incomplete 3D reconstruction of a lumpy object, drawn as tens of thousands of points: mostly grey, with patches of cyan and orange and a thin red contour. Moving the pointer over it disturbs the points."></canvas>
+      <div class="hero-crosshair" aria-hidden="true"></div>
+      <pre class="hero-readout" aria-hidden="true" hidden></pre>
 
-// ── signal corruption ──────────────────────────────
-function startGlitch(){
-  const NOISE='!@#$%^&*<>?/|[]{}=~`░▒▓╬╫╪┼╔╗╚╝║═';
-  const body=document.body;
-  // WeakMap stores the TRUE original so stacked glitches never corrupt the baseline
-  const originals=new WeakMap();
-  const restoreTimers=new WeakMap();
+      <p class="hero-tag mono" aria-hidden="true">
+        <span>FIELD_001</span>
+        <span data-hero-seed>SEED —</span>
+        <span>GROWN IN YOUR BROWSER</span>
+      </p>
 
-  function getNodes(){
-    const el=document.getElementById('content');
-    if(!el)return [];
-    const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{
-      acceptNode(n){
-        const p=n.parentElement;
-        if(!p)return NodeFilter.FILTER_REJECT;
-        const tag=p.tagName;
-        if(/^H[1-6]$/.test(tag)||tag==='STRONG'||tag==='EM')return NodeFilter.FILTER_ACCEPT;
-        return NodeFilter.FILTER_REJECT;
-      }
-    });
-    const nodes=[]; let n;
-    while((n=walker.nextNode()))if(n.textContent.trim().length>2)nodes.push(n);
-    return nodes;
-  }
+      <div class="hero-text">
+        <h1 id="hero-name">Marco Cermusoni</h1>
+        <p class="hero-line">3D worlds / AI experiments / spatial systems / community / other things I probably shouldn’t have started</p>
+        <span class="note hero-note" data-arrow="up-right">tools for more human worlds</span>
+      </div>
 
-  function corrupt(node,ms){
-    // Capture true original only once per node
-    if(!originals.has(node)) originals.set(node,node.textContent);
-    const orig=originals.get(node);
-    const len=Math.floor(Math.random()*12)+3;
-    const start=Math.floor(Math.random()*Math.max(1,orig.length-len));
-    let g=orig.slice(0,start);
-    for(let i=0;i<len;i++)g+=NOISE[Math.floor(Math.random()*NOISE.length)];
-    node.textContent=g+orig.slice(start+len);
-    // Clear any pending restore, schedule a new one
-    clearTimeout(restoreTimers.get(node));
-    restoreTimers.set(node, setTimeout(()=>{
-      node.textContent=orig;
-      originals.delete(node);
-    }, ms));
-  }
+      <div class="hero-hud mono">
+        <div class="view" role="group" aria-label="Representation">
+          <span class="view-label" aria-hidden="true">View</span>
+          <button type="button" data-mode="POINTS" aria-pressed="true">Points</button>
+          <button type="button" data-mode="MESH" aria-pressed="false">Mesh</button>
+          <button type="button" data-mode="SPLATS" aria-pressed="false">Splats</button>
+          <button type="button" data-mode="DEPTH" aria-pressed="false">Depth</button>
+        </div>
+        <p class="hero-stats" data-hero-stats>Loading field…</p>
+      </div>
+    </section>
 
-  function nukeNode(){
-    const nodes=getNodes(); if(!nodes.length)return;
-    const node=nodes[Math.floor(Math.random()*nodes.length)];
-    if(!originals.has(node)) originals.set(node,node.textContent);
-    const orig=originals.get(node);
-    node.textContent=Array.from({length:orig.length},()=>NOISE[Math.floor(Math.random()*NOISE.length)]).join('');
-    clearTimeout(restoreTimers.get(node));
-    restoreTimers.set(node, setTimeout(()=>{ node.textContent=orig; originals.delete(node); },60+Math.random()*80));
-  }
+    <!-- ───────────── WORK ───────────── -->
+    <section id="work" class="work sec" aria-labelledby="work-h">
+      <header class="sec-head">
+        <h2 id="work-h" class="sec-label mono">Work</h2>
+        <p class="sec-intro">Things I built, taught, ran, or helped happen.</p>
+        <span class="note work-note" data-arrow="down-left">real worlds → brighter people</span>
+      </header>
+      <div class="filter-row">
+        <div class="filters" role="group" aria-label="Filter projects by tag"></div>
+        <p class="mono muted" data-work-count aria-live="polite"></p>
+      </div>
+      <div class="work-grid"></div>
+      <noscript><p class="muted">The project list needs JavaScript. Sorry. It’s mostly a graphics site.</p></noscript>
+    </section>
 
-  function scrambleNode(delay=0){
-    const nodes=getNodes(); if(!nodes.length)return;
-    const node=nodes[Math.floor(Math.random()*nodes.length)];
-    setTimeout(()=>corrupt(node, 50+Math.random()*120), delay);
-  }
+    <!-- ───────────── LAB ───────────── -->
+    <section id="lab" class="lab sec" aria-labelledby="lab-h">
+      <header class="sec-head">
+        <h2 id="lab-h" class="sec-label mono">Lab</h2>
+        <p class="sec-intro">Experiments. Tests, shaders, failures. No business case required.</p>
+      </header>
+      <ol class="lab-list"></ol>
+    </section>
 
-  function burst(){
-    const count=Math.floor(Math.random()*4)+2;
-    for(let i=0;i<count;i++) scrambleNode(i*55+Math.random()*40);
-  }
+    <!-- ───────────── INPUT ───────────── -->
+    <section id="input" class="input sec" aria-labelledby="input-h">
+      <header class="sec-head">
+        <h2 id="input-h" class="sec-label mono">Input</h2>
+        <p class="sec-intro">Things I noticed. Not photography, just stuff that goes in before other stuff comes out.</p>
+      </header>
 
-  function flicker(){
-    body.style.filter='brightness(1.6) hue-rotate(8deg)';
-    setTimeout(()=>{ body.style.filter='brightness(0.4)'; },30);
-    setTimeout(()=>{ body.style.filter=''; },80);
-  }
+      <figure class="input-figure" data-stage="SOURCE">
+        <div class="input-stage" role="img" aria-label="">
+          <canvas class="layer-source"></canvas>
+          <canvas class="layer-depth"></canvas>
+          <canvas class="layer-points"></canvas>
+        </div>
+        <div class="input-controls mono" role="group" aria-label="Processing stage">
+          <button type="button" data-stage="SOURCE" aria-pressed="true">Source</button><span aria-hidden="true">→</span>
+          <button type="button" data-stage="DEPTH" aria-pressed="false">Depth</button><span aria-hidden="true">→</span>
+          <button type="button" data-stage="POINTS" aria-pressed="false">Points</button><span aria-hidden="true">→</span>
+          <button type="button" data-stage="OUTPUT" aria-pressed="false">Output</button>
+        </div>
+        <figcaption class="input-cap mono">
+          <span><b data-input-id>INPUT_000</b> · <span data-input-place></span> · <span data-input-date></span></span>
+          <span class="muted" data-stage-info aria-live="polite"></span>
+        </figcaption>
+        <span class="note input-note" data-arrow="left"></span>
+      </figure>
+    </section>
 
-  function glitch(){
-    const r=Math.random();
-    if(r<0.45)      scrambleNode();
-    else if(r<0.70) burst();
-    else if(r<0.85) nukeNode();
-    else            { burst(); flicker(); }
-    sched();
-  }
+    <!-- ───────────── ABOUT ───────────── -->
+    <section id="about" class="about sec" aria-labelledby="about-h">
+      <h2 id="about-h" class="sec-label mono">About</h2>
+      <div class="about-text" data-about-text></div>
+      <div class="about-side">
+        <p class="mono muted">Works across</p>
+        <ul class="about-areas mono" data-about-areas></ul>
+        <p class="mono muted">Elsewhere</p>
+        <ul class="about-links mono" data-links></ul>
+      </div>
+    </section>
+  </main>
 
-  function sched(){ setTimeout(glitch,5500+Math.random()*3000); }
-  sched();
-}
+  <footer class="site-foot mono">
+    <p>Marco Cermusoni <span aria-hidden="true">/</span> On Earth <span aria-hidden="true">/</span> 2026</p>
+    <span class="note foot-note">same planet, brighter worlds →</span>
+    <ul class="foot-links" data-links></ul>
+  </footer>
 
-// ── content loader ─────────────────────────────────
-marked.use({ renderer:{ link({href,title,text}){ return `<a href="${href}"${title?` title="${title}"`:''}  target="_blank" rel="noopener">${text}</a>`; } } });
-marked.setOptions({breaks:true});
-fetch('content.md')
-  .then(r=>{ if(!r.ok)throw new Error(r.status); return r.text(); })
-  .then(text=>{ document.getElementById('content').innerHTML=marked.parse(text); initTagFilter(); })
-  .catch(err=>{ document.getElementById('content').textContent='// error: '+err.message; });
-
-// ── tag filter ─────────────────────────────────────
-function initTagFilter(){
-  const legendTags=[...document.querySelectorAll('.tag-legend .tag')];
-  const items=[...document.querySelectorAll('#content .project')];
-  const active=new Set();
-  function apply(){
-    for(const el of items){
-      const has = active.size===0 || [...active].some(tag=>el.querySelector(`.tag[data-tag="${tag}"]`));
-      el.classList.toggle('tag-dim', !has);
-    }
-    for(const t of legendTags) t.classList.toggle('active', active.has(t.dataset.tag));
-  }
-  for(const t of legendTags){
-    t.addEventListener('click',()=>{
-      const tag=t.dataset.tag;
-      if(active.has(tag)) active.delete(tag); else active.add(tag);
-      apply();
-    });
-  }
-}
-</script>
+  <dialog class="case" aria-labelledby="case-title">
+    <div class="case-inner"></div>
+  </dialog>
 </body>
 </html>
